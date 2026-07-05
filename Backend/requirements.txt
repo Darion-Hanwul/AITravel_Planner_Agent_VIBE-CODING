@@ -4,6 +4,8 @@ uvicorn[standard]
 sqlalchemy
 psycopg2-binary
 
+greenlet
+
 alembic
 
 pydantic
@@ -16,6 +18,10 @@ python-jose[cryptography]
 passlib[bcrypt]
 
 python-multipart
+
+email-validator
+
+python-decouple
 
 httpx
 

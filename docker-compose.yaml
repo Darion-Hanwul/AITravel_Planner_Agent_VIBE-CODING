@@ -1,31 +1,55 @@
+version: "3.9"
+
 services:
 
   postgres:
-    image: postgres:16
-    container_name: AITravelPlannerAgent_postgres
 
-    restart: always
+    image: postgres:16
+
+    container_name: ${POSTGRES_CONTAINER}
+
+    restart: unless-stopped
 
     environment:
+
       POSTGRES_USER: ${POSTGRES_USER}
+
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
       POSTGRES_DB: ${POSTGRES_DB}
 
     ports:
-      - "5432:5432"
+
+      - "${POSTGRES_PORT}:5432"
 
     volumes:
+
       - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+
+      interval: 10s
+
+      timeout: 5s
+
+      retries: 5
+
+    networks:
+
+      - travelplanner-network
 
   weaviate:
 
     image: semitechnologies/weaviate:latest
 
-    container_name: travelplanner_weaviate
+    container_name: ${WEAVIATE_CONTAINER}
 
-    restart: always
+    restart: unless-stopped
 
     ports:
+
       - "${WEAVIATE_PORT}:8080"
 
     environment:
@@ -36,51 +60,138 @@ services:
 
       PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
 
-      DEFAULT_VECTORIZER_MODULE: none
+      DEFAULT_VECTORIZER_MODULE: "none"
 
       ENABLE_MODULES: ""
 
-      CLUSTER_HOSTNAME: node1
+      CLUSTER_HOSTNAME: "node1"
 
     volumes:
+
       - weaviate_data:/var/lib/weaviate
+
+    healthcheck:
+
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/v1/.well-known/ready"]
+
+      interval: 20s
+
+      timeout: 10s
+
+      retries: 5
+
+    networks:
+
+      - travelplanner-network
 
   ollama:
 
     image: ollama/ollama:latest
 
-    container_name: travelplanner_ollama
+    container_name: ${OLLAMA_CONTAINER}
 
-    restart: always
+    restart: unless-stopped
 
     ports:
+
       - "${OLLAMA_PORT}:11434"
 
     volumes:
+
       - ollama_data:/root/.ollama
-      
+
+    networks:
+
+      - travelplanner-network
+
   backend:
+
     build:
-      context: ./backend
+
+      context: ./Backend
+
       dockerfile: Dockerfile
 
-    container_name: travelplanner_backend
+    container_name: ${BACKEND_CONTAINER}
 
-    restart: always
+    restart: unless-stopped
 
     ports:
+
       - "${BACKEND_PORT}:8000"
 
     env_file:
-      - .env
+
+      - ./Backend/.env.docker
 
     volumes:
-      - ./backend:/app
+
+      - ./Backend:/app
 
     depends_on:
-      - postgres
-      - weaviate
-      - ollama
+
+      postgres:
+
+        condition: service_healthy
+
+      weaviate:
+
+        condition: service_started
+
+      ollama:
+
+        condition: service_started
+
+    command: >
+
+      uvicorn main:app
+
+      --host 0.0.0.0
+
+      --port 8000
+
+      --reload
+
+    networks:
+
+      - travelplanner-network
+
+  frontend:
+
+    build:
+
+      context: ./Frontend
+
+      dockerfile: Dockerfile
+
+    container_name: ${FRONTEND_CONTAINER}
+
+    restart: unless-stopped
+
+    ports:
+
+      - "${FRONTEND_PORT}:5173"
+
+    env_file:
+
+      - ./Frontend/.env.docker
+
+    volumes:
+
+      - ./Frontend:/app
+
+      - /app/node_modules
+
+    depends_on:
+
+      - backend
+
+    command: npm run dev -- --host
+
+    networks:
+
+      - travelplanner-network
+
 
 volumes:
 
@@ -89,3 +200,9 @@ volumes:
   weaviate_data:
 
   ollama_data:
+
+networks:
+
+  travelplanner-network:
+
+    driver: bridge
