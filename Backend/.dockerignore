@@ -1,0 +1,15 @@
+__pycache__/
+
+*.pyc
+
+*.pyo
+
+*.pyd
+
+.venv
+
+logs
+
+tests
+
+.env
