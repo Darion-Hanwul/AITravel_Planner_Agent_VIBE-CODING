@@ -5,50 +5,36 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 # ==========================================================
-# Tool Execute Request
+# Base
 # ==========================================================
 
-class ToolExecutionRequest(BaseModel):
+class DocumentBase(BaseModel):
 
-    tool_name: str = Field(..., min_length=2)
+    title: str = Field(..., min_length=2, max_length=255)
 
-    input_data: dict
+    file_name: str = Field(..., min_length=2)
 
-
-# ==========================================================
-# Tool Execute Response
-# ==========================================================
-
-class ToolExecutionResponse(BaseModel):
-
-    tool_name: str
-
-    success: bool
-
-    output_data: dict
+    source: str = Field(..., min_length=2)
 
 
 # ==========================================================
-# Tool Log Response
+# Upload
 # ==========================================================
 
-class ToolLogResponse(BaseModel):
+class DocumentUpload(BaseModel):
+
+    title: str = Field(..., min_length=2, max_length=255)
+
+
+# ==========================================================
+# Response
+# ==========================================================
+
+class DocumentResponse(DocumentBase):
 
     id: UUID
 
-    trip_id: UUID
-
-    tool_name: str
-
-    input: str
-
-    output: str
-
-    status: str
-
-    execution_time_ms: int
-
-    created_at: datetime
+    uploaded_at: datetime
 
     model_config = ConfigDict(
         from_attributes=True

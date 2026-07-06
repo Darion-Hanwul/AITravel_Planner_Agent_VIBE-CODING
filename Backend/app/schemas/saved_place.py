@@ -1,4 +1,4 @@
-from datetime import date, time
+from decimal import Decimal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -8,24 +8,28 @@ from pydantic import BaseModel, ConfigDict, Field
 # Base
 # ==========================================================
 
-class CalendarEventBase(BaseModel):
+class SavedPlaceBase(BaseModel):
 
-    event_title: str = Field(..., min_length=2, max_length=200)
+    name: str = Field(..., min_length=2, max_length=200)
 
-    event_date: date
+    country: str = Field(..., min_length=2, max_length=100)
 
-    start_time: time
+    city: str = Field(..., min_length=2, max_length=100)
 
-    end_time: time
+    latitude: Decimal
 
-    reminder: bool = True
+    longitude: Decimal
+
+    category: str
+
+    notes: str | None = None
 
 
 # ==========================================================
 # Create
 # ==========================================================
 
-class CalendarEventCreate(CalendarEventBase):
+class SavedPlaceCreate(SavedPlaceBase):
     pass
 
 
@@ -33,28 +37,32 @@ class CalendarEventCreate(CalendarEventBase):
 # Update
 # ==========================================================
 
-class CalendarEventUpdate(BaseModel):
+class SavedPlaceUpdate(BaseModel):
 
-    event_title: str | None = None
+    name: str | None = None
 
-    event_date: date | None = None
+    country: str | None = None
 
-    start_time: time | None = None
+    city: str | None = None
 
-    end_time: time | None = None
+    latitude: Decimal | None = None
 
-    reminder: bool | None = None
+    longitude: Decimal | None = None
+
+    category: str | None = None
+
+    notes: str | None = None
 
 
 # ==========================================================
 # Response
 # ==========================================================
 
-class CalendarEventResponse(CalendarEventBase):
+class SavedPlaceResponse(SavedPlaceBase):
 
     id: UUID
 
-    activity_id: UUID
+    user_id: UUID
 
     model_config = ConfigDict(
         from_attributes=True

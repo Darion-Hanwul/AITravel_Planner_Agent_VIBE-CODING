@@ -1,4 +1,5 @@
-from datetime import date, time
+from datetime import time
+from decimal import Decimal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -8,24 +9,30 @@ from pydantic import BaseModel, ConfigDict, Field
 # Base
 # ==========================================================
 
-class CalendarEventBase(BaseModel):
+class ActivityBase(BaseModel):
 
-    event_title: str = Field(..., min_length=2, max_length=200)
+    place_name: str = Field(..., min_length=2, max_length=200)
 
-    event_date: date
+    category: str = Field(..., min_length=2, max_length=100)
 
     start_time: time
 
     end_time: time
 
-    reminder: bool = True
+    estimated_cost: Decimal = Field(..., ge=0)
+
+    latitude: Decimal | None = None
+
+    longitude: Decimal | None = None
+
+    notes: str | None = None
 
 
 # ==========================================================
 # Create
 # ==========================================================
 
-class CalendarEventCreate(CalendarEventBase):
+class ActivityCreate(ActivityBase):
     pass
 
 
@@ -33,28 +40,34 @@ class CalendarEventCreate(CalendarEventBase):
 # Update
 # ==========================================================
 
-class CalendarEventUpdate(BaseModel):
+class ActivityUpdate(BaseModel):
 
-    event_title: str | None = None
+    place_name: str | None = None
 
-    event_date: date | None = None
+    category: str | None = None
 
     start_time: time | None = None
 
     end_time: time | None = None
 
-    reminder: bool | None = None
+    estimated_cost: Decimal | None = Field(default=None, ge=0)
+
+    latitude: Decimal | None = None
+
+    longitude: Decimal | None = None
+
+    notes: str | None = None
 
 
 # ==========================================================
 # Response
 # ==========================================================
 
-class CalendarEventResponse(CalendarEventBase):
+class ActivityResponse(ActivityBase):
 
     id: UUID
 
-    activity_id: UUID
+    trip_day_id: UUID
 
     model_config = ConfigDict(
         from_attributes=True
