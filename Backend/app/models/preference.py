@@ -31,7 +31,9 @@ class UserPreference(Base):
         unique=True
     )
 
-    preferred_currency: Mapped[str] = mapped_column(String(10))
+    preferred_currency: Mapped[str] = mapped_column(
+        String(10)
+    )
 
     budget_min: Mapped[Decimal] = mapped_column(
         Numeric(12, 2)
@@ -69,6 +71,12 @@ class UserPreference(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now()
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
     )
 
     user = relationship(

@@ -1,55 +1,88 @@
-from datetime import datetime
-from uuid import UUID
-
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 # ==========================================================
-# Tool Execute Request
+# REGISTER REQUEST
 # ==========================================================
 
-class ToolExecutionRequest(BaseModel):
-
-    tool_name: str = Field(..., min_length=2)
-
-    input_data: dict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
-# ==========================================================
-# Tool Execute Response
-# ==========================================================
+class RegisterRequest(BaseModel):
 
-class ToolExecutionResponse(BaseModel):
+    full_name: str = Field(
+        ...,
+        min_length=3,
+        max_length=100,
+    )
 
-    tool_name: str
+    email: EmailStr
 
-    success: bool
-
-    output_data: dict
-
-
-# ==========================================================
-# Tool Log Response
-# ==========================================================
-
-class ToolLogResponse(BaseModel):
-
-    id: UUID
-
-    trip_id: UUID
-
-    tool_name: str
-
-    input: str
-
-    output: str
-
-    status: str
-
-    execution_time_ms: int
-
-    created_at: datetime
+    password: str = Field(
+        ...,
+        min_length=8,
+        max_length=100,
+    )
 
     model_config = ConfigDict(
-        from_attributes=True
+        extra="forbid",
+    )
+
+
+# ==========================================================
+# LOGIN REQUEST
+# ==========================================================
+
+class LoginRequest(BaseModel):
+
+    email: EmailStr
+
+    password: str
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+
+
+# ==========================================================
+# TOKEN RESPONSE
+# ==========================================================
+
+class TokenResponse(BaseModel):
+
+    access_token: str
+
+    refresh_token: str
+
+    token_type: str = "bearer"
+
+
+# ==========================================================
+# REFRESH TOKEN REQUEST
+# ==========================================================
+
+class RefreshTokenRequest(BaseModel):
+
+    refresh_token: str
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+
+# ==========================================================
+# CHANGE PASSWORD
+# ==========================================================
+
+class ChangePasswordRequest(BaseModel):
+
+    old_password: str
+
+    new_password: str = Field(
+        ...,
+        min_length=8,
+        max_length=100,
+    )
+
+    model_config = ConfigDict(
+        extra="forbid",
     )

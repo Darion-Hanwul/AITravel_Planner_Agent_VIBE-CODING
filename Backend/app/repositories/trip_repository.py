@@ -1,21 +1,26 @@
+from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
-from decimal import Decimal
-from app.models.trip import Trip
-from app.models.trip_day import TripDay
 from app.models.activity import Activity
 from app.models.calendar import CalendarEvent
-
+from app.models.trip import Trip
+from app.models.trip_day import TripDay
 from app.repositories.base_repository import BaseRepository
 
 
 class TripRepository(BaseRepository[Trip]):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(Trip)
+
+    # =====================================================
+    # GET TRIPS BY USER
+    # =====================================================
 
     def get_by_user(
         self,
@@ -23,12 +28,17 @@ class TripRepository(BaseRepository[Trip]):
         user_id: UUID,
     ) -> list[Trip]:
 
-        return (
-            db.query(Trip)
-            .filter(Trip.user_id == user_id)
+        stmt = (
+            select(Trip)
+            .where(Trip.user_id == user_id)
             .order_by(Trip.created_at.desc())
-            .all()
         )
+
+        return list(db.scalars(stmt))
+
+    # =====================================================
+    # GET COMPLETE TRIP
+    # =====================================================
 
     def get_trip_detail(
         self,
@@ -36,16 +46,21 @@ class TripRepository(BaseRepository[Trip]):
         trip_id: UUID,
     ) -> Optional[Trip]:
 
-        return (
-            db.query(Trip)
+        stmt = (
+            select(Trip)
             .options(
                 joinedload(Trip.trip_days)
                 .joinedload(TripDay.activities)
                 .joinedload(Activity.calendar_event)
             )
-            .filter(Trip.id == trip_id)
-            .first()
+            .where(Trip.id == trip_id)
         )
+
+        return db.scalar(stmt)
+
+    # =====================================================
+    # UPDATE STATUS
+    # =====================================================
 
     def update_status(
         self,
@@ -56,7 +71,14 @@ class TripRepository(BaseRepository[Trip]):
 
         trip.status = status
 
-        return self.update(db, trip)
+        return self.update(
+            db,
+            trip,
+        )
+
+    # =====================================================
+    # UPDATE TOTAL COST
+    # =====================================================
 
     def update_total_cost(
         self,
@@ -67,13 +89,20 @@ class TripRepository(BaseRepository[Trip]):
 
         trip.total_estimated_cost = total_cost
 
-        return self.update(db, trip)
+        return self.update(
+            db,
+            trip,
+        )
 
 
 class TripDayRepository(BaseRepository[TripDay]):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(TripDay)
+
+    # =====================================================
+    # GET BY TRIP
+    # =====================================================
 
     def get_by_trip(
         self,
@@ -81,18 +110,25 @@ class TripDayRepository(BaseRepository[TripDay]):
         trip_id: UUID,
     ) -> list[TripDay]:
 
-        return (
-            db.query(TripDay)
-            .filter(TripDay.trip_id == trip_id)
+        stmt = (
+            select(TripDay)
+            .where(TripDay.trip_id == trip_id)
             .order_by(TripDay.day_number.asc())
-            .all()
+        )
+
+        return list(
+            db.scalars(stmt)
         )
 
 
 class ActivityRepository(BaseRepository[Activity]):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(Activity)
+
+    # =====================================================
+    # GET BY TRIP DAY
+    # =====================================================
 
     def get_by_trip_day(
         self,
@@ -100,27 +136,16 @@ class ActivityRepository(BaseRepository[Activity]):
         trip_day_id: UUID,
     ) -> list[Activity]:
 
-        return (
-            db.query(Activity)
-            .filter(Activity.trip_day_id == trip_day_id)
-            .order_by(Activity.start_time.asc())
-            .all()
+        stmt = (
+            select(Activity)
+            .where(
+                Activity.trip_day_id == trip_day_id
+            )
+            .order_by(
+                Activity.start_time.asc()
+            )
         )
 
-
-class CalendarRepository(BaseRepository[CalendarEvent]):
-
-    def __init__(self):
-        super().__init__(CalendarEvent)
-
-    def get_by_activity(
-        self,
-        db: Session,
-        activity_id: UUID,
-    ) -> Optional[CalendarEvent]:
-
-        return (
-            db.query(CalendarEvent)
-            .filter(CalendarEvent.activity_id == activity_id)
-            .first()
+        return list(
+            db.scalars(stmt)
         )

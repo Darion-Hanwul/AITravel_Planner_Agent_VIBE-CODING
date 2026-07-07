@@ -1,6 +1,8 @@
 from typing import Generic, Optional, Type, TypeVar
 from uuid import UUID
 
+from sqlalchemy import func
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.base import Base
@@ -12,11 +14,16 @@ class BaseRepository(Generic[ModelType]):
     """
     Generic Base Repository.
 
-    Menyediakan operasi CRUD dasar
-    yang digunakan oleh seluruh repository.
+    Menyediakan operasi CRUD dasar.
+
+    Seluruh transaction (commit / rollback)
+    dikelola oleh Service Layer.
     """
 
-    def __init__(self, model: Type[ModelType]):
+    def __init__(
+        self,
+        model: Type[ModelType],
+    ) -> None:
         self.model = model
 
     # ==========================================================
@@ -28,11 +35,7 @@ class BaseRepository(Generic[ModelType]):
         db: Session,
         obj: ModelType,
     ) -> ModelType:
-
         db.add(obj)
-        db.commit()
-        db.refresh(obj)
-
         return obj
 
     # ==========================================================
@@ -44,7 +47,6 @@ class BaseRepository(Generic[ModelType]):
         db: Session,
         id: UUID,
     ) -> Optional[ModelType]:
-
         return db.get(self.model, id)
 
     def get_all(
@@ -54,26 +56,34 @@ class BaseRepository(Generic[ModelType]):
         limit: int = 100,
     ) -> list[ModelType]:
 
-        return (
-            db.query(self.model)
+        stmt = (
+            select(self.model)
             .offset(skip)
             .limit(limit)
-            .all()
         )
+
+        return list(db.scalars(stmt))
 
     def first(
         self,
         db: Session,
     ) -> Optional[ModelType]:
 
-        return db.query(self.model).first()
+        stmt = (
+            select(self.model)
+            .limit(1)
+        )
+
+        return db.scalar(stmt)
 
     def count(
         self,
         db: Session,
     ) -> int:
 
-        return db.query(self.model).count()
+        stmt = select(func.count()).select_from(self.model)
+
+        return db.scalar(stmt) or 0
 
     def exists(
         self,
@@ -81,7 +91,7 @@ class BaseRepository(Generic[ModelType]):
         id: UUID,
     ) -> bool:
 
-        return db.get(self.model, id) is not None
+        return self.get_by_id(db, id) is not None
 
     # ==========================================================
     # UPDATE
@@ -94,8 +104,6 @@ class BaseRepository(Generic[ModelType]):
     ) -> ModelType:
 
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
 
         return db_obj
 
@@ -110,7 +118,6 @@ class BaseRepository(Generic[ModelType]):
     ) -> None:
 
         db.delete(db_obj)
-        db.commit()
 
     # ==========================================================
     # SESSION HELPERS
@@ -131,18 +138,12 @@ class BaseRepository(Generic[ModelType]):
 
         db.refresh(obj)
 
-    def save(
+    def commit(
         self,
         db: Session,
-        obj: Optional[ModelType] = None,
-    ) -> Optional[ModelType]:
+    ) -> None:
 
         db.commit()
-
-        if obj is not None:
-            db.refresh(obj)
-
-        return obj
 
     def rollback(
         self,

@@ -1,15 +1,22 @@
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.place import SavedPlace
 from app.repositories.base_repository import BaseRepository
 
 
-class SavedPlaceRepository(BaseRepository[SavedPlace]):
+class SavedPlaceRepository(
+    BaseRepository[SavedPlace]
+):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(SavedPlace)
+
+    # =====================================================
+    # GET USER SAVED PLACES
+    # =====================================================
 
     def get_by_user(
         self,
@@ -17,12 +24,23 @@ class SavedPlaceRepository(BaseRepository[SavedPlace]):
         user_id: UUID,
     ) -> list[SavedPlace]:
 
-        return (
-            db.query(SavedPlace)
-            .filter(SavedPlace.user_id == user_id)
-            .order_by(SavedPlace.name.asc())
-            .all()
+        stmt = (
+            select(SavedPlace)
+            .where(
+                SavedPlace.user_id == user_id
+            )
+            .order_by(
+                SavedPlace.name.asc()
+            )
         )
+
+        return list(
+            db.scalars(stmt)
+        )
+
+    # =====================================================
+    # SEARCH PLACE
+    # =====================================================
 
     def search_place(
         self,
@@ -31,11 +49,19 @@ class SavedPlaceRepository(BaseRepository[SavedPlace]):
         keyword: str,
     ) -> list[SavedPlace]:
 
-        return (
-            db.query(SavedPlace)
-            .filter(
+        stmt = (
+            select(SavedPlace)
+            .where(
                 SavedPlace.user_id == user_id,
-                SavedPlace.name.ilike(f"%{keyword}%")
+                SavedPlace.name.ilike(
+                    f"%{keyword}%"
+                ),
             )
-            .all()
+            .order_by(
+                SavedPlace.name.asc()
+            )
+        )
+
+        return list(
+            db.scalars(stmt)
         )

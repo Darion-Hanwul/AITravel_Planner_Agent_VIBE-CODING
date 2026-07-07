@@ -1,18 +1,25 @@
 from typing import Optional
 from uuid import UUID
 
+from sqlalchemy import delete
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.session import ChatSession
 from app.models.message import ChatMessage
-
+from app.models.session import ChatSession
 from app.repositories.base_repository import BaseRepository
 
 
-class ChatSessionRepository(BaseRepository[ChatSession]):
+class ChatSessionRepository(
+    BaseRepository[ChatSession]
+):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(ChatSession)
+
+    # =====================================================
+    # GET USER SESSIONS
+    # =====================================================
 
     def get_by_user(
         self,
@@ -20,12 +27,23 @@ class ChatSessionRepository(BaseRepository[ChatSession]):
         user_id: UUID,
     ) -> list[ChatSession]:
 
-        return (
-            db.query(ChatSession)
-            .filter(ChatSession.user_id == user_id)
-            .order_by(ChatSession.created_at.desc())
-            .all()
+        stmt = (
+            select(ChatSession)
+            .where(
+                ChatSession.user_id == user_id
+            )
+            .order_by(
+                ChatSession.created_at.desc()
+            )
         )
+
+        return list(
+            db.scalars(stmt)
+        )
+
+    # =====================================================
+    # GET LATEST SESSION
+    # =====================================================
 
     def get_latest_session(
         self,
@@ -33,18 +51,30 @@ class ChatSessionRepository(BaseRepository[ChatSession]):
         user_id: UUID,
     ) -> Optional[ChatSession]:
 
-        return (
-            db.query(ChatSession)
-            .filter(ChatSession.user_id == user_id)
-            .order_by(ChatSession.created_at.desc())
-            .first()
+        stmt = (
+            select(ChatSession)
+            .where(
+                ChatSession.user_id == user_id
+            )
+            .order_by(
+                ChatSession.created_at.desc()
+            )
+            .limit(1)
         )
 
+        return db.scalar(stmt)
 
-class ChatMessageRepository(BaseRepository[ChatMessage]):
 
-    def __init__(self):
+class ChatMessageRepository(
+    BaseRepository[ChatMessage]
+):
+
+    def __init__(self) -> None:
         super().__init__(ChatMessage)
+
+    # =====================================================
+    # GET SESSION MESSAGES
+    # =====================================================
 
     def get_by_session(
         self,
@@ -52,12 +82,23 @@ class ChatMessageRepository(BaseRepository[ChatMessage]):
         session_id: UUID,
     ) -> list[ChatMessage]:
 
-        return (
-            db.query(ChatMessage)
-            .filter(ChatMessage.session_id == session_id)
-            .order_by(ChatMessage.created_at.asc())
-            .all()
+        stmt = (
+            select(ChatMessage)
+            .where(
+                ChatMessage.session_id == session_id
+            )
+            .order_by(
+                ChatMessage.created_at.asc()
+            )
         )
+
+        return list(
+            db.scalars(stmt)
+        )
+
+    # =====================================================
+    # DELETE SESSION MESSAGES
+    # =====================================================
 
     def delete_session_messages(
         self,
@@ -65,10 +106,11 @@ class ChatMessageRepository(BaseRepository[ChatMessage]):
         session_id: UUID,
     ) -> None:
 
-        (
-            db.query(ChatMessage)
-            .filter(ChatMessage.session_id == session_id)
-            .delete()
+        stmt = (
+            delete(ChatMessage)
+            .where(
+                ChatMessage.session_id == session_id
+            )
         )
 
-        db.commit()
+        db.execute(stmt)

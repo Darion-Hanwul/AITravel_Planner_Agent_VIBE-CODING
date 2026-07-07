@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+from app.middleware.exception import register_exception_handlers
+
 from app.config.cors import ALLOWED_ORIGINS
 from app.config.settings import settings
 from app.db.init_db import init_database
@@ -28,6 +30,10 @@ app = FastAPI(
     debug=settings.DEBUG,
     lifespan=lifespan,
 )
+
+app = FastAPI()
+
+register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
