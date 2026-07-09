@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy import delete
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.message import ChatMessage
 from app.models.session import ChatSession
@@ -114,3 +114,25 @@ class ChatMessageRepository(
         )
 
         db.execute(stmt)
+
+    def get_detail(
+        self,
+        db: Session,
+        session_id: UUID,
+    ) -> ChatSession | None:
+        stmt = (
+            select(ChatSession)
+            .options(
+                joinedload(ChatSession.messages)
+            )
+        )
+
+    def create_message(
+        self,
+        db: Session,
+        message: ChatMessage,
+    ) -> ChatMessage:
+
+        db.add(message)
+
+        return message

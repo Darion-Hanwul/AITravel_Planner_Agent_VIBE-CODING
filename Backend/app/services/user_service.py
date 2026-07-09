@@ -19,6 +19,7 @@ from app.schemas.user import (
     UserPreferenceResponse,
     UserProfileResponse,
     UserResponse,
+    UserPreferenceUpdate,
 )
 
 class UserService(BaseService):
@@ -132,7 +133,48 @@ class UserService(BaseService):
         raise UserAlreadyExistsError(
             "Email is already registered.",
         )
+    
+    def _update_user_fields(
+        self,
+        user: User,
+        **kwargs,
+    ) -> None:
+        """
+        Update field-field user.
+        """
 
+        for field, value in kwargs.items():
+
+            if (
+                value is not None
+                and hasattr(user, field)
+            ):
+
+                setattr(
+                    user,
+                    field,
+                    value,
+                )
+
+        self.user_repository.update(
+            self.db,
+            user,
+        )
+
+    def _update_preference_fields(
+        self,
+        preference: UserPreference,
+        **kwargs,
+    ) -> None:
+        """
+        Update seluruh field preference.
+        """
+
+        self.preference_repository.update_preference(
+            self.db,
+            preference,
+            **kwargs,
+        )
     def _save_changes(
         self,
     ) -> None:
@@ -168,6 +210,7 @@ class UserService(BaseService):
 
     from app.schemas.user import (
         UserProfileResponse,
+        UserUpdate,
     )
 
     def get_profile(
@@ -199,46 +242,132 @@ class UserService(BaseService):
                 else None
             ),
         )
+    
     def update_profile(
         self,
         user_id: UUID,
-        full_name: str | None = None,
-        avatar_url: str | None = None,
-    ) -> User:
+        data: UserUpdate,
+    ) -> UserResponse:
         """
         Update profile user.
+        """
+        user = self._get_user_by_id(
+            user_id,
+        )
 
-        Raises:
-            UserNotFoundError
+        update_data = data.model_dump(
+            exclude_unset=True,
+        )
+
+        if (
+            "email" in update_data
+            and update_data["email"] != user.email
+        ):
+            self._ensure_email_available(
+                update_data["email"],
+                current_user_id=user.id,
+            )
+
+        self._update_user_fields(
+            user,
+            **update_data,
+        )
+        
+        self.user_repository.update(
+            self.db,
+            user,
+        )
+
+        self._save_changes()
+
+        self.refresh(user)
+
+        return UserResponse.model_validate(
+            user,
+        )
+    
+    def update_avatar(
+        self,
+        user_id: UUID,
+        avatar_url: str,
+    ) -> UserResponse:
+        """
+        Update avatar user.
+
+        Args:
+            user_id:
+                ID user.
+
+            avatar_url:
+                URL avatar baru.
+
+        Returns:
+            UserResponse
         """
 
         user = self._get_user_by_id(
             user_id,
         )
 
-        if full_name is not None:
-            user.full_name = full_name
+        self._update_user_fields(
+            user,
+            avatar_url=avatar_url,
+        )
 
-        if avatar_url is not None:
-            user.avatar_url = avatar_url
+        self._save_changes()
 
-        try:
+        self.refresh(
+            user,
+        )
 
-            self.user_repository.update(
-                self.db,
-                user,
-            )
+        return UserResponse.model_validate(
+            user,
+        )
+    
+    def get_preferences(
+        self,
+        user_id: UUID,
+    ) -> UserPreferenceResponse:
+        """
+        Mengambil preference milik user.
+        """
 
-            self.commit()
+        preference = self._get_preference(
+            user_id,
+        )
 
-            self.refresh(
-                user,
-            )
+        return UserPreferenceResponse.model_validate(
+            preference,
+        )
+    
+    def update_preferences(
+        self,
+        user_id: UUID,
+        data: UserPreferenceUpdate,
+    ) -> UserPreferenceResponse:
+        """
+        Update user preferences.
+        """
 
-        except Exception:
+        preference = self._get_preference(
+            user_id,
+        )
 
-            self.rollback()
+        update_data = data.model_dump(
+            exclude_unset=True,
+        )
 
-            raise
+        self._update_preference_fields(
+            preference,
+            **update_data,
+        )
 
-        return user
+        self._save_changes()
+
+        self.refresh(
+            preference,
+        )
+
+        return UserPreferenceResponse.model_validate(
+            preference,
+        )

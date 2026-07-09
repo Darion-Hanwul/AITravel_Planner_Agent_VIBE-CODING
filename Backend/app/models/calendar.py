@@ -4,6 +4,9 @@ from datetime import date
 from datetime import time
 
 from sqlalchemy import Boolean
+from sqlalchemy import DateTime
+from sqlalchemy import func
+from datetime import datetime
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
@@ -50,6 +53,17 @@ class CalendarEvent(Base):
     reminder: Mapped[bool] = mapped_column(
         Boolean,
         default=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
     )
 
     activity = relationship(

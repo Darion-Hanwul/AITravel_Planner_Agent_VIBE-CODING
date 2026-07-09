@@ -1,4 +1,5 @@
 from datetime import date, time
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -20,13 +21,17 @@ class CalendarEventBase(BaseModel):
 
     reminder: bool = True
 
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+
 
 # ==========================================================
 # Create
 # ==========================================================
 
 class CalendarEventCreate(CalendarEventBase):
-    pass
+    activity_id: UUID
 
 
 # ==========================================================
@@ -45,6 +50,10 @@ class CalendarEventUpdate(BaseModel):
 
     reminder: bool | None = None
 
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+
 
 # ==========================================================
 # Response
@@ -56,6 +65,10 @@ class CalendarEventResponse(CalendarEventBase):
 
     activity_id: UUID
 
+    created_at: datetime
+
+    updated_at: datetime
+
     model_config = ConfigDict(
-        from_attributes=True
+        from_attributes=True,
     )

@@ -19,7 +19,11 @@ class ChatSessionCreate(ChatSessionBase):
 
 class ChatSessionUpdate(BaseModel):
 
-    title: str | None = None
+    title: str | None = Field(
+        default=None,
+        min_length=2,
+        max_length=150,
+    )
 
 
 class ChatSessionResponse(ChatSessionBase):
@@ -47,7 +51,8 @@ class ChatMessageBase(BaseModel):
 
 
 class ChatMessageCreate(ChatMessageBase):
-    pass
+
+    message: str = Field(..., min_length=1)
 
 
 class ChatMessageResponse(ChatMessageBase):
@@ -61,7 +66,6 @@ class ChatMessageResponse(ChatMessageBase):
     model_config = ConfigDict(
         from_attributes=True
     )
-
 
 # ==========================================================
 # Detail Session

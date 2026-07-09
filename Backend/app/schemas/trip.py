@@ -5,8 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.trip_day import TripDayDetailResponse
-
-
+from app.core.constants import TripStatus
 # ==========================================================
 # Base
 # ==========================================================
@@ -25,16 +24,30 @@ class TripBase(BaseModel):
 
     total_estimated_cost: Decimal = Field(..., ge=0)
 
-    status: str
+    status: TripStatus
 
 
 # ==========================================================
 # Create
 # ==========================================================
 
-class TripCreate(TripBase):
-    pass
+class TripCreate(BaseModel):
 
+    title: str
+
+    destination: str
+
+    start_date: date
+
+    end_date: date
+
+    budget: Decimal
+
+    status: TripStatus = TripStatus.PLANNING
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
 
 # ==========================================================
 # Update
@@ -54,7 +67,11 @@ class TripUpdate(BaseModel):
 
     total_estimated_cost: Decimal | None = Field(default=None, ge=0)
 
-    status: str | None = None
+    status: TripStatus | None = None
+
+    model_config = ConfigDict(
+        extra="forbid",
+    )
 
 
 # ==========================================================

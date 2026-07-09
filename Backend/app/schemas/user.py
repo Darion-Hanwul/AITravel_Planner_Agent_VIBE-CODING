@@ -29,6 +29,7 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     full_name: str | None = Field(default=None, min_length=3, max_length=100)
     avatar_url: str | None = None
+    email: EmailStr | None = None
     model_config = ConfigDict(
         extra="forbid",
     )
