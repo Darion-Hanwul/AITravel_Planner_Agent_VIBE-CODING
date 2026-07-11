@@ -3,42 +3,43 @@ uvicorn[standard]
 
 sqlalchemy
 psycopg2-binary
-
 greenlet
-
 alembic
 
 pydantic
 pydantic-settings
 
 python-dotenv
+python-decouple
 
 python-jose[cryptography]
-
 passlib[bcrypt]
 
 python-multipart
-
 email-validator
 
-python-decouple
-
 httpx
-
 requests
+
+beautifulsoup4
+
+lxml
+
+loguru
 
 weaviate-client
 
 langchain
-
+langchain-core
 langchain-community
-
-langgraph
-
+langchain-weaviate
 langchain-ollama
+langgraph
 
 ollama
 
-pytest
+pypdf
+tiktoken
 
-loguru
+pytest
+pypdf

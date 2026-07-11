@@ -33,7 +33,7 @@ def get_current_user(
 
     try:
 
-        return auth_service.get_user_by_access_token(
+        return auth_service.verify_access_token(
             token,
         )
 
@@ -71,7 +71,7 @@ def get_optional_user(
 
     try:
 
-        return auth_service.get_user_by_access_token(
+        return auth_service.verify_access_token(
             token,
         )
 
