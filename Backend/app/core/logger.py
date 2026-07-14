@@ -74,3 +74,5 @@ logger.add(
 # ==========================================================
 
 app_logger = logger
+
+logger = app_logger

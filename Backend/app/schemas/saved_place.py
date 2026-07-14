@@ -2,6 +2,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
 
 
 # ==========================================================
@@ -67,3 +68,74 @@ class SavedPlaceResponse(SavedPlaceBase):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+# ==========================================================
+# AI PLACE SEARCH RESULT
+# ==========================================================
+
+
+class PlaceSearchResult(BaseModel):
+    """
+    Hasil pencarian lokasi dari
+    Nominatim API.
+    """
+
+    name: str
+
+    display_name: str
+
+    latitude: Decimal
+
+    longitude: Decimal
+
+    city: str | None = None
+
+    country: str | None = None
+
+    category: str | None = None
+
+    place_type: str | None = None
+
+
+# ==========================================================
+# AI FORWARD GEOCODING
+# ==========================================================
+
+
+class ForwardGeocodeResult(BaseModel):
+    """
+    Hasil geocoding dari nama lokasi
+    menjadi koordinat.
+    """
+
+    query: str
+
+    latitude: Decimal
+
+    longitude: Decimal
+
+    display_name: str
+
+
+# ==========================================================
+# AI REVERSE GEOCODING
+# ==========================================================
+
+
+class ReverseGeocodeResult(BaseModel):
+    """
+    Hasil reverse geocoding dari
+    koordinat menjadi alamat.
+    """
+
+    latitude: Decimal
+
+    longitude: Decimal
+
+    display_name: str
+
+    city: str | None = None
+
+    country: str | None = None
+
+    postcode: str | None = None

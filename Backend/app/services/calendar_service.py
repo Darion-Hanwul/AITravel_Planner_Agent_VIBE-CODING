@@ -98,13 +98,19 @@ class CalendarService(BaseService):
     ) -> None:
         """
         Memastikan rentang tanggal valid.
+
+        Raises
+        ------
+        ValidationError
+            Jika end_date lebih awal dari start_date.
         """
 
-        self._validate_date_range(
-            start_date,
-            end_date,
-        )
+        if end_date < start_date:
 
+            raise ValidationError(
+                "End date must be after start date.",
+            )
+        
     def _to_response(
         self,
         event: CalendarEvent,
@@ -298,11 +304,10 @@ class CalendarService(BaseService):
         Mengambil seluruh event dalam rentang tanggal.
         """
 
-        if end_date < start_date:
-
-            raise ValidationError(
-                "End date must be after start date.",
-            )
+        self._validate_date_range(
+            start_date,
+            end_date,
+        )
 
         events = self.calendar_repository.get_between_dates(
             self.db,

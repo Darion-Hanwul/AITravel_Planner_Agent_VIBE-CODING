@@ -93,12 +93,41 @@ class Settings(BaseSettings):
     LOG_LEVEL: str
     LOG_DIR: str
 
+    WEATHER_CACHE_EXPIRE_MINUTES: int = 15
+    OPENWEATHER_API_KEY: str
+    OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
+
+    # =====================================================
+    # CURRENCY
+    # =====================================================
+
+    EXCHANGERATE_API_KEY: str
+
+    EXCHANGERATE_BASE_URL: str = (
+        "https://v6.exchangerate-api.com/v6"
+    )
+
+    CURRENCY_CACHE_EXPIRE_MINUTES: int = 15
+
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
         case_sensitive=True,
         extra="ignore",
     )
 
+    # =====================================================
+    # PLACE SEARCH
+    # =====================================================
+
+    NOMINATIM_BASE_URL: str = (
+        "https://nominatim.openstreetmap.org"
+    )
+
+    NOMINATIM_USER_AGENT: str = (
+        "TravelPlannerAgent/1.0"
+    )
+
+    PLACE_SEARCH_TIMEOUT: int = 60
 
 @lru_cache
 def get_settings() -> Settings:

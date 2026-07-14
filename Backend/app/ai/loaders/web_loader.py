@@ -103,61 +103,6 @@ class WebLoader:
             f"Cannot fetch {url}"
         ) from last_exception
 
-    def _clean_html(
-        self,
-        html: str,
-    ) -> str:
-        """
-        Membersihkan HTML menjadi plain text.
-        """
-
-        soup = BeautifulSoup(
-            html,
-            "lxml",
-        )
-
-        for tag in soup(
-            [
-                "script",
-                "style",
-                "footer",
-                "header",
-                "nav",
-                "noscript",
-                "svg",
-            ]
-        ):
-
-            tag.decompose()
-
-        text = soup.get_text(
-            separator=" ",
-            strip=True,
-        )
-
-        return " ".join(
-            text.split()
-        )
-
-    def _to_document(
-        self,
-        source: Source,
-        url: str,
-        text: str,
-    ) -> Document:
-        """
-        Mengubah hasil crawling menjadi LangChain Document.
-        """
-
-        return Document(
-            page_content=text,
-            metadata={
-                "source": source.name,
-                "category": source.category,
-                "url": url,
-            },
-        )
-
     async def _load_url(
         self,
         client: httpx.AsyncClient,
