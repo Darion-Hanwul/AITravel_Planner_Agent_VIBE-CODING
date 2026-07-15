@@ -56,6 +56,60 @@ class EmbeddingService:
         return self.embedding_model.embed_query(
             text,
         )
+    
+    def embed_text(
+        self,
+        text: str,
+    ) -> list[float]:
+        """
+        Menghasilkan embedding dari sebuah teks.
+
+        Method ini digunakan oleh AI Component
+        yang tidak menggunakan LangChain Document,
+        seperti:
+
+        - Prompt Injection Guard
+        - Moderation
+        - Intent Detection
+        - Memory
+
+        Args:
+            text:
+                Teks yang akan di-embedding.
+
+        Returns:
+            Vector embedding.
+        """
+
+        return self._embed(
+            text,
+        )
+
+    def embed_texts(
+        self,
+        texts: list[str],
+    ) -> list[list[float]]:
+        """
+        Menghasilkan embedding untuk banyak teks.
+
+        Berbeda dengan embed_documents(),
+        method ini menerima list string biasa
+        tanpa perlu membuat LangChain Document.
+
+        Args:
+            texts:
+                Daftar teks.
+
+        Returns:
+            List vector embedding.
+        """
+
+        if not texts:
+            return []
+
+        return self.embedding_model.embed_documents(
+            texts,
+        )
 
     # =====================================================
     # PUBLIC METHODS
@@ -131,3 +185,4 @@ class EmbeddingService:
             )
 
         return embedded_documents
+    

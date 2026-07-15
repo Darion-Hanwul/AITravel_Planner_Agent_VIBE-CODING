@@ -129,6 +129,55 @@ class Settings(BaseSettings):
 
     PLACE_SEARCH_TIMEOUT: int = 60
 
+    # =====================================================
+    # GUARDRAILS
+    # =====================================================
+
+    MIN_PROMPT_LENGTH: int = 1
+
+    MAX_PROMPT_LENGTH: int = 100000
+
+    MAX_CONSECUTIVE_WHITESPACE: int = 10
+
+    MAX_REPEATED_CHARACTERS: int = 15
+
+    MAX_EMOJI_COUNT: int = 30
+
+    # =====================================================
+    # PROMPT INJECTION
+    # =====================================================
+
+    PROMPT_INJECTION_THRESHOLD: float = 0.65
+
+    PROMPT_INJECTION_REGEX_WEIGHT: float = 0.45
+    PROMPT_INJECTION_KEYWORD_WEIGHT: float = 0.25
+    PROMPT_INJECTION_EMBEDDING_WEIGHT: float = 0.30
+    PROMPT_INJECTION_REGEX_EARLY_STOP: float = 0.90
+
+    PROMPT_INJECTION_COMBINED_EARLY_STOP: float = 0.85
+    PROMPT_INJECTION_SIMILARITY_THRESHOLD: float = 0.80
+
+    PROMPT_INJECTION_EXAMPLES_FILE: str = (
+        "app/ai/prompts/prompt_injection_examples.txt"
+    )
+
+    # =====================================================
+    # MODERATION
+    # =====================================================
+
+    MODERATION_THRESHOLD: float = 0.65
+
+    MODERATION_LOW_THRESHOLD: float = 0.30
+    MODERATION_MEDIUM_THRESHOLD: float = 0.50
+    MODERATION_HIGH_THRESHOLD: float = 0.75
+    MODERATION_CRITICAL_THRESHOLD: float = 0.90
+
+    MODERATION_REGEX_WEIGHT: float = 0.60
+    MODERATION_KEYWORD_WEIGHT: float = 0.40
+
+    MODERATION_REGEX_EARLY_STOP: float = 0.90
+    MODERATION_COMBINED_EARLY_STOP: float = 0.80
+    
 @lru_cache
 def get_settings() -> Settings:
     return Settings() # pyright: ignore
