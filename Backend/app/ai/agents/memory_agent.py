@@ -1,45 +1,64 @@
 from __future__ import annotations
 
-import httpx
-from app.ai.agents.base_agent import BaseAgent
-from app.config.settings import settings
+from typing import Any
+
+from app.ai.agents.base_agent import BaseAgent, LLMModelProtocol
+from app.ai.prompt_builder import PromptBuilder
+from app.ai.tools.tool_registry import ToolRegistry
 
 
 class MemoryAgent(BaseAgent):
     """
-    MemoryAgent bertugas menganalisis interaksi chat untuk mengekstrak
-    preferensi pengguna yang implisit (misal: 'Saya tidak suka seafood', 'Saya bepergian dengan bayi').
+    MemoryAgent bertanggung jawab menganalisis riwayat percakapan secara asinkron/sinkron
+    untuk mengekstrak fakta-fakta implisit pengguna dan menyimpannya secara terpisah (Prinsip 1, 18).
+
+    Responsibility
+    --------------
+    - Mengidentifikasi preferensi tersembunyi (e.g. alergi makanan, ketertarikan museum).
+    - Memisahkan penyimpanan memori jangka panjang dari riwayat chat kasual.
+
+    Tidak bertanggung jawab terhadap:
+    - Menyimpan log obrolan mentah (tugas ChatRepository/Service).
     """
+
+    def __init__(
+        self,
+        *,
+        prompt_builder: PromptBuilder,
+        llm_model: LLMModelProtocol,
+        tool_registry: ToolRegistry | None = None,
+    ) -> None:
+        super().__init__(
+            prompt_builder=prompt_builder,
+            llm_model=llm_model,
+            tool_registry=tool_registry,
+        )
 
     @property
     def name(self) -> str:
+        """Nama identifikasi agen."""
         return "Memory Agent"
 
     @property
     def task_prompt_filename(self) -> str:
-        return "system.txt"  # Menggunakan system atau prompt khusus analisis memori jika ada
+        """Menggunakan system template untuk panduan penarikan informasi."""
+        return "system.txt"
 
-    def call_llm(self, prompt: str) -> str:
-        payload = {
-            "model": getattr(settings, "OLLAMA_MODEL", "llama3"),
-            "prompt": prompt,
-            "stream": False,
-        }
-        
-        try:
-            ollama_url = f"{settings.OLLAMA_BASE_URL}/api/generate"
-            response = httpx.post(ollama_url, json=payload, timeout=60.0)
-            response.raise_for_status()
-            return str(response.json().get("response", ""))
-        except Exception as exc:
-            raise RuntimeError(f"Gagal memanggil LLM pada {self.name}: {exc}") from exc
+    def extract_implicit_preferences(self, history: list[str]) -> str:
+        """
+        Mengekstrak poin preferensi krusial dari histori obrolan pengguna (Prinsip 18).
 
-    def extract_user_preferences(self, conversation_history: list[str]) -> str:
+        Args:
+            history: List baris teks rekaman obrolan pengguna dan asisten.
+
+        Returns:
+            str: JSON String atau poin-poin preferensi hasil ekstraksi yang bersih.
         """
-        Mengekstrak fakta-fakta kunci dari riwayat chat.
-        """
-        question = (
-            "Analisislah percakapan di bawah ini dan ambil poin penting mengenai preferensi, "
-            "hobi, alergi, atau kebiasaan travel pengguna dalam format poin-poin singkat."
+        analysis_question = (
+            "Tugas: Analisislah seluruh riwayat percakapan di bawah ini.\n"
+            "Ekstrak fakta-fakta spesifik mengenai preferensi pengguna, batasan fisik, "
+            "alergi, penghematan anggaran, penginapan favorit, dan gaya liburan mereka.\n"
+            "Format Hasil: Hanya kembalikan poin-poin data tanpa kata pengantar basa-basi."
         )
-        return self.run(question=question, history=conversation_history)
+
+        return self.run(question=analysis_question, history=history)

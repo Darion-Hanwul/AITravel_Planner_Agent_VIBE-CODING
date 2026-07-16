@@ -1,54 +1,80 @@
 from __future__ import annotations
 
-import httpx
 from typing import Any
 
-from app.ai.agents.base_agent import BaseAgent
-from app.config.settings import settings
+from app.ai.agents.base_agent import BaseAgent, LLMModelProtocol
+from app.ai.prompt_builder import PromptBuilder
+from app.ai.tools.tool_registry import ToolRegistry
+from app.ai.models.retrieved_document import RetrievedDocument
 
 
 class ScheduleAgent(BaseAgent):
     """
-    ScheduleAgent bertanggung jawab untuk menyusun manajemen waktu, rute logistik harian,
-    serta sinkronisasi jadwal agar efisien dan tidak tumpang tindih.
+    ScheduleAgent bertanggung jawab menyusun urutan kronologis waktu, itinerary harian,
+    dan alokasi durasi kunjungan agar logis dan efisien (Prinsip 1).
+
+    Responsibility
+    --------------
+    - Mengatur jadwal waktu per hari (itinerary pagi, siang, malam).
+    - Memastikan tidak ada jadwal yang tumpang tindih (*overlapping*).
+
+    Tidak bertanggung jawab terhadap:
+    - Menghitung kalkulasi anggaran biaya (tugas BudgetAgent).
+    - Validasi keamanan wilayah (tugas SafetyAgent).
     """
+
+    def __init__(
+        self,
+        *,
+        prompt_builder: PromptBuilder,
+        llm_model: LLMModelProtocol,
+        tool_registry: ToolRegistry | None = None,
+    ) -> None:
+        super().__init__(
+            prompt_builder=prompt_builder,
+            llm_model=llm_model,
+            tool_registry=tool_registry,
+        )
 
     @property
     def name(self) -> str:
+        """Nama identifikasi agen."""
         return "Schedule Agent"
 
     @property
     def task_prompt_filename(self) -> str:
+        """Nama file template prompt schedule."""
         return "schedule.txt"
 
-    def call_llm(self, prompt: str) -> str:
-        payload = {
-            "model": getattr(settings, "OLLAMA_MODEL", "llama3"),
-            "prompt": prompt,
-            "stream": False,
-        }
+    def build_schedule(
+        self,
+        destination: str,
+        duration_days: int,
+        activities: list[str],
+        documents: list[RetrievedDocument] | None = None,
+    ) -> str:
+        """
+        Menyusun rancangan linimasa waktu perjalanan harian.
+
+        Args:
+            destination: Nama lokasi tujuan.
+            duration_days: Durasi liburan dalam hitungan hari.
+            activities: Daftar mentah tempat/atraksi yang ingin dikunjungi.
+            documents: Konteks jam operasional atau jarak tempuh lokasi (RAG).
+
+        Returns:
+            str: Susunan jadwal harian mendetail dari LLM.
+        """
+        calendar_status: str = "Sinkronisasi kalender tidak aktif."
         
-        try:
-            ollama_url = f"{settings.OLLAMA_BASE_URL}/api/generate"
-            response = httpx.post(ollama_url, json=payload, timeout=60.0)
-            response.raise_for_status()
-            return str(response.json().get("response", ""))
-        except Exception as exc:
-            raise RuntimeError(f"Gagal memanggil LLM pada {self.name}: {exc}") from exc
+        if self.tools.exists("calendar_tool"):
+            calendar_res = self.execute_tool("calendar_tool", destination=destination)
+            calendar_status = str(calendar_res)
 
-    def create_itinerary(self, days: int, destinations: list[str], query: str) -> str:
-        """
-        Menyusun rancangan alokasi waktu per hari.
-        """
-        calendar_status = ""
-        if self.tools.exists("calendar"):
-            calendar_status = self.execute_tool("calendar", action="get_availability")
-
-        enhanced_query = (
-            f"Jumlah Hari: {days} Hari\n"
-            f"Daftar Tempat: {', '.join(destinations)}\n"
-            f"Status Kalender: {calendar_status}\n"
-            f"Detail Tambahan: {query}"
+        formatted_question = (
+            f"Buatkan itinerary terstruktur harian di {destination} selama {duration_days} hari.\n"
+            f"Daftar Atraksi Target: {', '.join(activities)}\n"
+            f"Status Kalender Pengguna: {calendar_status}"
         )
-        
-        return self.run(question=enhanced_query)
+
+        return self.run(question=formatted_question, documents=documents)

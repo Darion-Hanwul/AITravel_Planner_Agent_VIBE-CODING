@@ -1,11 +1,27 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Protocol
 
 from app.ai.prompt_builder import PromptBuilder
 from app.ai.tools.tool_registry import ToolRegistry
 from app.ai.models.retrieved_document import RetrievedDocument
+
+# Menginisialisasi logger standar produksi (Prinsip 8)
+logger = logging.getLogger("app.ai.agents")
+
+
+class LLMModelProtocol(Protocol):
+    """
+    Protocol untuk wrapper LLM guna memastikan decoupling total 
+    antara Agent dan HTTP Client (Prinsip 11, 12).
+    """
+    def generate(self, prompt: str, **kwargs: Any) -> str:
+        """
+        Mengirimkan prompt ke LLM dan mengembalikan teks respons.
+        """
+        ...
 
 
 class BaseAgent(ABC):
@@ -15,22 +31,37 @@ class BaseAgent(ABC):
     Responsibility
     --------------
     - Mengelola instansiasi PromptBuilder dan ToolRegistry.
-    - Menyediakan antarmuka standar untuk eksekusi tugas agen (solve/run).
-    - Menangani alur penyiapan prompt secara otomatis.
+    - Menyediakan antarmuka standar untuk eksekusi tugas agen (run).
+    - Menangani alur penyiapan prompt secara otomatis dengan caching internal.
+    - Mengisolasi pemanggilan LLM melalui LLMModelProtocol.
 
     Tidak bertanggung jawab terhadap:
-    - Logika spesifik masing-masing domain agen (budget, planning, etc.).
-    - Alur routing graf (LangGraph).
+    - Logika spesifik masing-masing domain agen (budget, planning, dll).
+    - Koneksi HTTP langsung ke penyedia LLM (Prinsip 12).
     """
 
     def __init__(
         self,
         *,
         prompt_builder: PromptBuilder,
+        llm_model: LLMModelProtocol,
         tool_registry: ToolRegistry | None = None,
     ) -> None:
+        """
+        Inisialisasi BaseAgent.
+
+        Args:
+            prompt_builder: Instance pembangun prompt terpusat.
+            llm_model: Wrapper model LLM yang patuh terhadap LLMModelProtocol.
+            tool_registry: Registry untuk alat bantu eksternal agen.
+        """
         self.prompt_builder = prompt_builder
+        self.llm_model = llm_model
         self.tools = tool_registry or ToolRegistry()
+        
+        # Caching prompt di tingkat memori (Prinsip 24: Performance Awareness)
+        # Menghindari operasi I/O-blocking disk berulang pada saat runtime.
+        self._cached_task_prompt: str | None = None
 
     @property
     @abstractmethod
@@ -48,13 +79,14 @@ class BaseAgent(ABC):
         """
         pass
 
-    @abstractmethod
-    def call_llm(self, prompt: str) -> str:
+    def _get_task_prompt(self) -> str:
         """
-        Metode abstrak untuk memanggil LLM yang digunakan proyek Anda.
-        Harus diimplementasikan berdasarkan LLM Wrapper yang dipakai (misal Ollama/OpenAI).
+        Mengambil isi file prompt dengan memanfaatkan cache internal.
         """
-        pass
+        if self._cached_task_prompt is None:
+            logger.debug(f"[{self.name}] Membaca file template prompt '{self.task_prompt_filename}' dari disk.")
+            self._cached_task_prompt = self.prompt_builder._load_prompt(self.task_prompt_filename)
+        return self._cached_task_prompt
 
     def _prepare_prompt(
         self,
@@ -63,10 +95,18 @@ class BaseAgent(ABC):
         history: list[str] | None = None,
     ) -> str:
         """
-        Menyusun prompt lengkap menggunakan PromptBuilder.
+        Menyusun prompt lengkap menggunakan PromptBuilder (Prinsip 1).
+
+        Args:
+            question: Pertanyaan atau instruksi user terkini.
+            documents: Dokumen konteks hasil retrieval (jika ada).
+            history: Catatan riwayat percakapan sebelumnya (jika ada).
+
+        Returns:
+            str: Prompt akhir yang siap dikirimkan ke LLM.
         """
         system_prompt = self.prompt_builder.system_prompt()
-        task_prompt = self.prompt_builder._load_prompt(self.task_prompt_filename)
+        task_prompt = self._get_task_prompt()
 
         return self.prompt_builder.build(
             system_prompt=system_prompt,
@@ -78,9 +118,22 @@ class BaseAgent(ABC):
 
     def execute_tool(self, tool_name: str, **kwargs: Any) -> Any:
         """
-        Helper untuk mengeksekusi tool yang terdaftar di agen ini.
+        Helper terisolasi untuk mengeksekusi tool yang terdaftar (Prinsip 12, 16).
+
+        Args:
+            tool_name: Nama tool yang ingin dieksekusi.
+            **kwargs: Parameter dinamis untuk kebutuhan eksekusi tool.
+
+        Returns:
+            Any: Hasil kembalian dari tool atau pesan kegagalan yang terkendali.
         """
-        return self.tools.execute(tool_name, **kwargs)
+        try:
+            logger.info(f"[{self.name}] Mengeksekusi tool '{tool_name}' dengan argumen: {kwargs}")
+            return self.tools.execute(tool_name, **kwargs)
+        except Exception as exc:
+            # Fail Gracefully & Log detailed trace (Prinsip 8 & 10)
+            logger.exception(f"[{self.name}] Kegagalan eksekusi tool '{tool_name}'.")
+            return f"Tool '{tool_name}' is temporarily unavailable. Error: {str(exc)}"
 
     def run(
         self,
@@ -89,11 +142,29 @@ class BaseAgent(ABC):
         history: list[str] | None = None,
     ) -> str:
         """
-        Alur eksekusi utama agen (Sync).
+        Alur eksekusi utama agen untuk reasoning (Prinsip 15).
+
+        Args:
+            question: Pertanyaan atau instruksi user.
+            documents: Konteks dokumen RAG.
+            history: Catatan riwayat percakapan.
+
+        Returns:
+            str: Respons tekstual final dari LLM.
         """
         compiled_prompt = self._prepare_prompt(
             question=question,
             documents=documents,
             history=history,
         )
-        return self.call_llm(compiled_prompt)
+        
+        try:
+            logger.info(f"[{self.name}] Mengirimkan prompt reasoning ke LLM.")
+            return self.llm_model.generate(compiled_prompt)
+        except Exception as exc:
+            # Fail Gracefully & Log detailed trace (Prinsip 8 & 10)
+            logger.exception(f"[{self.name}] Kegagalan fatal saat menghubungi LLM.")
+            return (
+                f"Asisten [{self.name}] mengalami kendala saat memproses permintaan Anda. "
+                f"Detail: {str(exc)}. Silakan coba beberapa saat lagi."
+            )

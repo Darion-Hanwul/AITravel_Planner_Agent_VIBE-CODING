@@ -1,28 +1,37 @@
+from __future__ import annotations
+
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.middleware.exception import register_exception_handlers
-
 from app.config.cors import ALLOWED_ORIGINS
 from app.config.settings import settings
 from app.db.init_db import init_database
 from app.db.session import engine
+from app.middleware.exception import register_exception_handlers
+
+logger = logging.getLogger("app.main")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Starting TravelPlannerAgent...")
+    """
+    Mengelola siklus hidup (lifespan) aplikasi saat startup dan shutdown.
+    """
+    logger.info(f"Memulai {settings.APP_NAME}...")
 
-    # Test koneksi database saat startup
-    init_database()
+    try:
+        init_database()
+        logger.info("Inisialisasi database sukses dilakukan.")
+    except Exception as exc:
+        logger.critical(f"Gagal melakukan inisialisasi database saat startup: {exc}")
 
     yield
 
-    print("Stopping TravelPlannerAgent...")
-
+    logger.info(f"Menghentikan {settings.APP_NAME}...")
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -30,8 +39,6 @@ app = FastAPI(
     debug=settings.DEBUG,
     lifespan=lifespan,
 )
-
-app = FastAPI()
 
 register_exception_handlers(app)
 
@@ -44,8 +51,11 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/", tags=["Root"])
 async def root():
+    """
+    Endpoint utama untuk verifikasi status aplikasi.
+    """
     return {
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
@@ -54,20 +64,34 @@ async def root():
     }
 
 
-@app.get("/health")
+@app.get("/health", tags=["System"])
 async def health_check():
+    """
+    Endpoint health-check untuk kebutuhan monitoring container docker/orchestrator.
+    """
     return {
         "status": "healthy",
         "service": settings.APP_NAME,
     }
 
 
-@app.get("/db-test")
-def db_test():
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT version();"))
-        version = result.scalar()
+@app.get("/db-test", tags=["System"])
+async def db_test():
+    """
+    Endpoint uji koneksi untuk memeriksa keaktifan PostgreSQL engine.
+    """
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT version();"))
+            version = result.scalar()
 
-    return {
-        "database": version
-    }
+        return {
+            "status": "connected",
+            "database": version
+        }
+    except Exception as exc:
+        logger.error(f"[Main API] Gagal terhubung ke database via /db-test: {exc}")
+        return {
+            "status": "disconnected",
+            "error": "Layanan database tidak dapat dijangkau."
+        }
