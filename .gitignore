@@ -16,13 +16,13 @@ weaviate_data/
 ollama_data/
 
 # Python cache
-**/__pycache__/
+**/__pycache__
 **/*.pyc
 **/*.pyo
 **/*.pyd
 
 # Testing cache
-**/.pytest_cache/
+**/.pytest_cache
 **/.tox/
 **/coverage/
 

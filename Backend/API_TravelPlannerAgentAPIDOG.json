@@ -1,0 +1,1522 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Default module",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "TravelPlannerAgent API"
+    },
+    {
+      "name": "TravelPlannerAgent API/Authentication"
+    },
+    {
+      "name": "TravelPlannerAgent API/User"
+    },
+    {
+      "name": "TravelPlannerAgent API/Trips"
+    },
+    {
+      "name": "TravelPlannerAgent API/Calendar"
+    },
+    {
+      "name": "TravelPlannerAgent API/Chat"
+    },
+    {
+      "name": "TravelPlannerAgent API/AI"
+    },
+    {
+      "name": "TravelPlannerAgent API/Tool"
+    },
+    {
+      "name": "TravelPlannerAgent API/History"
+    },
+    {
+      "name": "TravelPlannerAgent API/Saved Place"
+    },
+    {
+      "name": "TravelPlannerAgent API/RAG"
+    }
+  ],
+  "paths": {
+    "/Base_URLAPI_Version/auth/me": {
+      "get": {
+        "summary": "Profile Auth",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Authentication"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/Base_URLAPI_Version/auth/login": {
+      "post": {
+        "summary": "Login Auth",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Authentication"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "email": "Darion@gmail.com",
+                "password": "12345678"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/auth/register": {
+      "post": {
+        "summary": "Register Auth",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Authentication"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "full_name": "TravelPlannerAgent",
+                "email": "Darion@gmail.com",
+                "password": "12345678"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/users/prefrences": {
+      "put": {
+        "summary": "User Module Prefrences",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "preferred_currency": "Euro",
+                "travel_style": "Hikingr",
+                "hotel_star": 5
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "summary": "User Module Prefrences",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/User"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/users/profile": {
+      "put": {
+        "summary": "User Module Profile",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "full_name": "TravelPlannerAgent",
+                "favorite_country": "German"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "summary": "User Module profile",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/User"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/activities": {
+      "delete": {
+        "summary": "Activity Trip",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "put": {
+        "summary": "Activity Trip",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "summary": "Activity Trip",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "summary": "Activity Trip",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/trips/{trip_id}/days": {
+      "post": {
+        "summary": "Trip Day ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "summary": "Trip Day ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/trips/{id}": {
+      "delete": {
+        "summary": "Trip Module ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "put": {
+        "summary": "Trip Module ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/trips/{trip_id}": {
+      "get": {
+        "summary": "Trip Module ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/trips": {
+      "get": {
+        "summary": "Trip Module",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "summary": "Trip Module",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Trips"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "title": "German Trip",
+                "destination": "German",
+                "start_date": "2026-10-01",
+                "end_date": "2026-10-07",
+                "budget": 20000000
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/calendar": {
+      "delete": {
+        "summary": "Calendar",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Calendar"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "put": {
+        "summary": "Calendar",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Calendar"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "summary": "Calendar",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Calendar"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "summary": "Calendar",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Calendar"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/chat/session/{id}": {
+      "delete": {
+        "summary": "Chat Session ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Chat"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      },
+      "get": {
+        "summary": "Chat Session ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Chat"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/chat/session": {
+      "get": {
+        "summary": "Chat Session",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Chat"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/chat": {
+      "post": {
+        "summary": "Chat",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Chat"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "message": "Saya ingin ke German selama 7 hari."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/ai/summary": {
+      "post": {
+        "summary": "AI Summary",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/AI"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/ai/travel-tips": {
+      "post": {
+        "summary": "AI Travel Tips",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/AI"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/ai/packing-list": {
+      "post": {
+        "summary": "AI Packing List",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/AI"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/ai/generate-itinerary": {
+      "post": {
+        "summary": "AI Generate Itinerary / Rencana Perjalanan",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/AI"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/ai/optimize-budget": {
+      "post": {
+        "summary": "AI Optimize Budget",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/AI"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/ai/plan-trip": {
+      "post": {
+        "summary": "AI Plan Trip",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/AI"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "destination": "German",
+                "budget": 20000000,
+                "days": 7
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/tool/weather": {
+      "post": {
+        "summary": "Tool Weather / Cuaca",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Tool"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "city": "Tokyo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/tool/currency": {
+      "post": {
+        "summary": "Tool Currency",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Tool"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "from": "USD",
+                "to": "Euro",
+                "amount": 200
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/tool/maps": {
+      "post": {
+        "summary": "Tool Maps",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Tool"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/tool/hotel": {
+      "post": {
+        "summary": "Tool Hotel ",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Tool"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/tool/restaurant": {
+      "post": {
+        "summary": "Tool Restaurant",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Tool"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/tool/calendar": {
+      "post": {
+        "summary": "Tool Calendar",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Tool"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/tool/flight": {
+      "post": {
+        "summary": "Tool Flight",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Tool"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/history": {
+      "get": {
+        "summary": "History",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/History"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/history/{trip_id}": {
+      "get": {
+        "summary": "History",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/History"
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/saved-place": {
+      "get": {
+        "summary": "Saved Place ",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Saved Place"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "delete": {
+        "summary": "Saved Place",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Saved Place"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/saved-palce": {
+      "post": {
+        "summary": "Saved Place",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/Saved Place"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/rag/upload": {
+      "post": {
+        "summary": "Rag Upload",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/RAG"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/rag/index": {
+      "post": {
+        "summary": "RAG Index",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/RAG"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/rag/search": {
+      "post": {
+        "summary": "RAG Search",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/RAG"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": {
+                "query": "Visa German"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/rag/document": {
+      "get": {
+        "summary": "RAG Document",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/RAG"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/Base_URLAPI_Version/rag/document{id}": {
+      "delete": {
+        "summary": "RAG Document ID",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "TravelPlannerAgent API/RAG"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "responses": {},
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": [],
+  "security": []
+}
