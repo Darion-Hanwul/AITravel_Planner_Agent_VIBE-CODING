@@ -13,6 +13,8 @@ from app.api import (
     user,
 )
 from app.config import settings  # Pastikan Anda memiliki konfigurasi settings di core
+from app.middleware.auth import AuthenticationMiddleware
+from app.middleware.logging import LoggingMiddleware
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -23,15 +25,26 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
     )
 
-    # ==========================================================
-    # CORS MIDDLEWARE CONFIGURATION
-    # ==========================================================
-    # Sesuaikan origins dengan kebutuhan frontend Anda
     origins = [
         "http://localhost:3000",  # React / Next.js default
         "http://127.0.0.1:3000",
         "*",                      # Ubah ke domain spesifik saat production demi keamanan
     ]
+    
+    app.add_middleware(LoggingMiddleware)
+    app.add_middleware(AuthenticationMiddleware)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # ==========================================================
+    # CORS MIDDLEWARE CONFIGURATION
+    # ==========================================================
+    # Sesuaikan origins dengan kebutuhan frontend Anda
 
     app.add_middleware(
         CORSMiddleware,

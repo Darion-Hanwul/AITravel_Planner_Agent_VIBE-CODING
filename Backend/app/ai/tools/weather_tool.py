@@ -11,8 +11,9 @@ from app.ai.tools.base_tool import BaseTool
 from app.config.settings import settings
 from app.core.logger import logger
 from app.db.session import SessionLocal
-
+from app.utils.cache import is_cache_valid
 from app.models.weather import WeatherCache
+
 from app.repositories.weather_repository import (
     WeatherRepository,
 )
@@ -125,26 +126,6 @@ class WeatherTool(BaseTool):
             country=country,
         )
 
-    def _is_cache_valid(
-        self,
-        weather: WeatherCache,
-    ) -> bool:
-        """
-        Mengecek apakah weather cache masih valid.
-
-        Cache dianggap valid apabila umur cache
-        belum melebihi WEATHER_CACHE_EXPIRE_MINUTES.
-        """
-
-        if weather.fetched_at is None:
-            return False
-
-        expire_time = weather.fetched_at + timedelta(
-            minutes=self.CACHE_EXPIRE_MINUTES,
-        )
-
-        return datetime.utcnow() < expire_time
-    
     def _fetch_weather(
         self,
         city: str,
@@ -310,8 +291,9 @@ class WeatherTool(BaseTool):
 
             if (
                 cache is not None
-                and self._is_cache_valid(
-                    cache,
+                and is_cache_valid(
+                    cache.fetched_at,
+                    self.CACHE_EXPIRE_MINUTES,
                 )
             ):
 

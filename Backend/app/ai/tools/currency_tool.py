@@ -11,6 +11,7 @@ from app.ai.tools.base_tool import BaseTool
 from app.config.settings import settings
 from app.core.logger import logger
 from app.db.session import SessionLocal
+from app.utils.cache import is_cache_valid
 
 from app.models.currency import CurrencyHistory
 from app.repositories.currency_repository import (
@@ -152,30 +153,6 @@ class CurrencyTool(BaseTool):
             db=db,
             base_currency=base_currency,
             target_currency=target_currency,
-        )
-
-    def _is_cache_valid(
-        self,
-        currency: CurrencyHistory,
-    ) -> bool:
-        """
-        Mengecek apakah cache exchange rate
-        masih valid.
-        """
-
-        if currency.fetched_at is None:
-            return False
-
-        expire_time = (
-            currency.fetched_at
-            + timedelta(
-                minutes=self.CACHE_EXPIRE_MINUTES,
-            )
-        )
-
-        return (
-            datetime.now(timezone.utc)
-            < expire_time
         )
     
     def _fetch_exchange_rate(
@@ -398,8 +375,9 @@ class CurrencyTool(BaseTool):
 
             if (
                 cache is not None
-                and self._is_cache_valid(
-                    cache,
+                and is_cache_valid(
+                    cache.fetched_at,
+                    self.CACHE_EXPIRE_MINUTES,
                 )
             ):
 
