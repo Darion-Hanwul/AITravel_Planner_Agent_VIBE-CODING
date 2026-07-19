@@ -94,7 +94,6 @@ class Settings(BaseSettings):
     # WEATHER
     # =====================================================
     WEATHER_CACHE_EXPIRE_MINUTES: int = 15
-    # Diberikan nilai bawaan string kosong agar tidak memicu ValidationError saat dev mode
     OPENWEATHER_API_KEY: str = ""
     OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
 
