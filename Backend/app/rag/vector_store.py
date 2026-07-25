@@ -1,109 +1,317 @@
-"""
-Vector Store Manager (Weaviate v4 Edition)
-
-Mengelola koneksi klien ke Vector Database Weaviate v4, inisialisasi koleksi,
-serta operasi penyimpanan dan pencarian similarity chunk dokumen.
-"""
-
 import weaviate
-import weaviate.classes.config as wvc
+
+from typing import List, Dict, Any, Optional
+
 from app.config.settings import settings
 
 
 class WeaviateVectorStore:
+
     def __init__(self) -> None:
-        # Menggunakan koneksi v4 standar dengan mengombinasikan HTTP dan gRPC port
-        self.client = weaviate.connect_to_local(
-            host=settings.POSTGRES_HOST if "localhost" in settings.WEAVIATE_URL else "localhost",
-            port=8080, # Default port REST Weaviate
-            grpc_port=settings.WEAVIATE_GRPC_PORT
+
+        self.client = None
+        self.collection = None
+
+        self.collection_name = (
+            settings.WEAVIATE_CLASS
         )
-        self.class_name = settings.WEAVIATE_CLASS
-        self._init_collection()
 
-    def _init_collection(self) -> None:
-        """
-        Membuat koleksi (skema kelas) di Weaviate v4 jika belum terdaftar.
-        """
+        self._connect()
+
+    # ==========================================================
+    # CONNECTION
+    # ==========================================================
+
+    def _connect(self) -> None:
+
         try:
-            # Memeriksa keberadaan koleksi menggunakan API v4 client.collections.exists()
-            if not self.client.collections.exists(self.class_name):
-                self.client.collections.create(
-                    name=self.class_name,
-                    description="Penyimpanan dokumen kontekstual untuk Travel Planner Agent RAG",
-                    # Vectorizer diset None karena kita akan memasukkan custom vector hasil embedding Ollama
-                    vectorizer_config=None,
-                    properties=[
-                        wvc.Property(
-                            name="document_id",
-                            data_type=wvc.DataType.TEXT,
-                            description="ID relasi ke database SQL model Document"
-                        ),
-                        wvc.Property(
-                            name="content",
-                            data_type=wvc.DataType.TEXT,
-                            description="Potongan teks (chunk) konten dokumen"
-                        ),
-                        wvc.Property(
-                            name="source_name",
-                            data_type=wvc.DataType.TEXT,
-                            description="Nama file asli dokumen"
-                        )
-                    ]
+
+            self.client = weaviate.connect_to_local(
+                host="localhost",
+                port=int(
+                    settings.WEAVIATE_PORT
+                ),
+                grpc_port=int(
+                    settings.WEAVIATE_GRPC_PORT
+                ),
+            )
+
+            print(
+                "[Weaviate] Berhasil terhubung "
+                "ke Weaviate."
+            )
+
+            self._ensure_collection()
+
+        except Exception as e:
+
+            print(
+                "[Weaviate Connection Error]",
+                str(e),
+            )
+
+            self.client = None
+            self.collection = None
+
+    # ==========================================================
+    # ENSURE COLLECTION
+    # ==========================================================
+
+    def _ensure_collection(self) -> None:
+
+        if self.client is None:
+            return
+
+        try:
+
+            exists = (
+                self.client.collections.exists(
+                    self.collection_name
                 )
-        except Exception as e:
-            print(f"[Weaviate v4 Error] Gagal inisialisasi koleksi: {str(e)}")
-
-    def add_document_chunk(self, content: str, embedding: list[float], meta_data: dict) -> bool:
-        """
-        Menyimpan teks chunk beserta custom vector embedding ke Weaviate v4.
-        """
-        try:
-            collection = self.client.collections.get(self.class_name)
-            
-            # Perbaikan: Menggunakan .data.insert() untuk Weaviate v4
-            collection.data.insert(
-                properties={
-                    "content": content,
-                    "document_id": str(meta_data.get("document_id", "")),
-                    "source_name": meta_data.get("source_name", "")
-                },
-                vector=embedding
             )
-            return True
-        except Exception as e:
-            print(f"[Weaviate v4 Write Error] Gagal menyimpan chunk: {str(e)}")
-            return False
 
-    def search_similar_chunks(self, query_embedding: list[float], limit: int = 3) -> list[dict]:
-        """
-        Mencari potongan teks terdekat berdasarkan jarak kedekatan vektor menggunakan API v4 query.
-        """
-        try:
-            collection = self.client.collections.get(self.class_name)
-            
-            # Menggunakan query.near_vector bawaan Weaviate v4
-            response = collection.query.near_vector(
-                near_vector=query_embedding,
-                limit=limit,
-                return_properties=["content", "source_name", "document_id"]
+            if not exists:
+
+                print(
+                    f"[Weaviate] Collection "
+                    f"'{self.collection_name}' "
+                    "belum tersedia."
+                )
+
+                self.collection = None
+
+                return
+
+            self.collection = (
+                self.client.collections.get(
+                    self.collection_name
+                )
             )
-            
-            # Parsing hasil pencarian objek v4 ke format standar list dictionary
-            results = []
-            for obj in response.objects:
-                results.append({
-                    "content": obj.properties.get("content"),
-                    "source_name": obj.properties.get("source_name"),
-                    "document_id": obj.properties.get("document_id")
-                })
-            return results
+
+            print(
+                f"[Weaviate] Collection "
+                f"'{self.collection_name}' "
+                "sudah tersedia."
+            )
+
         except Exception as e:
-            print(f"[Weaviate v4 Query Error] Gagal melakukan pencarian: {str(e)}")
+
+            print(
+                "[Weaviate Collection Error]",
+                str(e),
+            )
+
+            self.collection = None
+
+    # ==========================================================
+    # NORMALIZE LIMIT
+    # ==========================================================
+
+    def _normalize_limit(
+        self,
+        limit: Optional[int],
+    ) -> int:
+
+        if limit is not None:
+
+            normalized_limit = limit
+
+        else:
+
+            top_k = getattr(
+                settings,
+                "TOP_K",
+                5,
+            )
+
+            if top_k is None:
+
+                normalized_limit = 5
+
+            else:
+
+                normalized_limit = int(
+                    top_k
+                )
+
+        if normalized_limit < 1:
+
+            normalized_limit = 1
+
+        if normalized_limit > 20:
+
+            normalized_limit = 20
+
+        return normalized_limit
+
+    # ==========================================================
+    # SEARCH SIMILAR CHUNKS
+    # ==========================================================
+
+    def search_similar_chunks(
+        self,
+        query_embedding: List[float],
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+
+        if not query_embedding:
+
+            print(
+                "[Weaviate] Query embedding kosong."
+            )
+
             return []
 
+        if self.client is None:
+
+            print(
+                "[Weaviate] Client tidak tersedia."
+            )
+
+            return []
+
+        if self.collection is None:
+
+            print(
+                "[Weaviate] Collection tidak tersedia."
+            )
+
+            return []
+
+        search_limit = (
+            self._normalize_limit(
+                limit
+            )
+        )
+
+        try:
+
+            response = (
+                self.collection.query.near_vector(
+                    near_vector=query_embedding,
+                    limit=search_limit,
+                )
+            )
+
+            objects = (
+                response.objects
+                if response
+                else []
+            )
+
+            if not objects:
+
+                print(
+                    "[Weaviate] Tidak ditemukan "
+                    "dokumen relevan."
+                )
+
+                return []
+
+            results = []
+
+            for obj in objects:
+
+                properties = (
+                    obj.properties
+                    if obj.properties
+                    else {}
+                )
+
+                content = (
+                    properties.get(
+                        "content",
+                        "",
+                    )
+                )
+
+                source_name = (
+                    properties.get(
+                        "source_name",
+                        "Unknown Source",
+                    )
+                )
+
+                if not content:
+
+                    continue
+
+                result = {
+
+                    "content":
+                        str(
+                            content
+                        ),
+
+                    "source_name":
+                        str(
+                            source_name
+                        ),
+
+                }
+
+                if (
+                    hasattr(
+                        obj,
+                        "metadata",
+                    )
+                    and obj.metadata
+                ):
+
+                    distance = getattr(
+                        obj.metadata,
+                        "distance",
+                        None,
+                    )
+
+                    if distance is not None:
+
+                        result[
+                            "distance"
+                        ] = distance
+
+                results.append(
+                    result
+                )
+
+            return results
+
+        except Exception as e:
+
+            print(
+                "[Weaviate Search Error]",
+                str(e),
+            )
+
+            return []
+
+    # ==========================================================
+    # CLOSE CONNECTION
+    # ==========================================================
+
     def close(self) -> None:
-        """
-        Menutup koneksi client Weaviate dengan aman (direkomendasikan pada v4).
-        """
-        self.client.close()
+
+        if self.client is None:
+
+            return
+
+        try:
+
+            self.client.close()
+
+            print(
+                "[Weaviate] Connection "
+                "berhasil ditutup."
+            )
+
+        except Exception as e:
+
+            print(
+                "[Weaviate Close Error]",
+                str(e),
+            )
+
+        finally:
+
+            self.client = None
+            self.collection = None

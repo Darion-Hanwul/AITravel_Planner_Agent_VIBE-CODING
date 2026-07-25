@@ -1,20 +1,15 @@
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase
+
+# Definisikan konvensi penamaan standar
+naming_convention = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+}
 
 class Base(DeclarativeBase):
-    pass
-
-# Import seluruh model
-
-from app.models.user import User
-from app.models.preference import UserPreference
-from app.models.trip import Trip
-from app.models.trip_day import TripDay
-from app.models.activity import Activity
-from app.models.calendar import CalendarEvent
-from app.models.place import SavedPlace
-from app.models.session import ChatSession
-from app.models.message import ChatMessage
-from app.models.document import Document
-from app.models.currency import CurrencyHistory
-from app.models.weather import WeatherCache
-from app.models.tool_log import ToolLog
+    metadata = MetaData(naming_convention=naming_convention)
