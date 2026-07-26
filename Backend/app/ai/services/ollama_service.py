@@ -25,7 +25,7 @@ class OllamaService:
     async def generate(
         self,
         prompt: str,
-        num_predict: int = 512,
+        num_predict: int = 6789,
         temperature: float = 0.4,
         top_p: float = 0.9,
         num_ctx: int = 2048,

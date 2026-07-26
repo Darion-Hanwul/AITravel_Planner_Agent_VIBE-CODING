@@ -10,6 +10,8 @@ alembic
 pydantic
 pydantic-settings
 python-dotenv
+weaviate
+binary 
 
 python-jose[cryptography]
 passlib[bcrypt]

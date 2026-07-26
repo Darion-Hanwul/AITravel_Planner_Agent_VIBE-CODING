@@ -29,3 +29,13 @@ ollama_data/
 # IDE settings
 .vscode/
 .idea/
+# Logs
+logs/*.log
+
+# Uploads
+uploads/docs/*
+uploads/images/*
+uploads/pdf/*
+
+# Abaikan isi folder uploads tetapi jangan abaikan berkas .gitkeep
+!uploads/**/.gitkeep
