@@ -21,15 +21,6 @@ from app.services.base_service import BaseService
 
 
 class WeatherService(BaseService):
-    """
-    Business logic untuk Weather Cache.
-
-    Bertanggung jawab terhadap:
-
-    - Weather Cache Management
-    - Weather Data Persistence
-    - Weather Retrieval
-    """
 
     def __init__(
         self,
@@ -42,18 +33,11 @@ class WeatherService(BaseService):
             WeatherRepository()
         )
 
-    # ======================================================
-    # PRIVATE HELPERS
-    # ======================================================
-
     def _get_weather_cache(
         self,
         city: str,
         country: str,
     ) -> WeatherCache:
-        """
-        Mengambil weather cache terbaru.
-        """
 
         weather = (
             self.weather_repository.get_latest_weather(
@@ -75,26 +59,15 @@ class WeatherService(BaseService):
         self,
         weather: WeatherCache,
     ) -> WeatherResponse:
-        """
-        Mapping ORM ke response schema.
-        """
 
         return WeatherResponse.model_validate(
             weather,
         )
 
-    # ======================================================
-    # PUBLIC METHODS
-    # ======================================================
-
     def get_weather(
         self,
         data: WeatherRequest,
     ) -> WeatherResponse:
-        """
-        Mengambil weather cache berdasarkan
-        lokasi.
-        """
 
         weather = self._get_weather_cache(
             data.city,
@@ -113,12 +86,6 @@ class WeatherService(BaseService):
         temperature,
         humidity,
     ) -> WeatherResponse:
-        """
-        Menyimpan weather cache baru.
-
-        Data ini nantinya berasal dari
-        Weather Tool / External API.
-        """
 
         weather_cache = WeatherCache(
             city=city,
@@ -155,9 +122,6 @@ class WeatherService(BaseService):
         self,
         weather_id: UUID,
     ) -> None:
-        """
-        Menghapus weather cache.
-        """
 
         weather = (
             self.weather_repository.get_by_id(

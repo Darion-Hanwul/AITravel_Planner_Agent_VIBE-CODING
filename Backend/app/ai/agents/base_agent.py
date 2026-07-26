@@ -8,10 +8,7 @@ from app.ai.prompt_builder import PromptBuilder
 from app.ai.tools.tool_registry import ToolRegistry
 from app.ai.models.retrieved_document import RetrievedDocument
 
-# Menginisialisasi logger standar produksi (Prinsip 8)
 logger = logging.getLogger("app.ai.agents")
-
-
 class LLMModelProtocol(Protocol):
     """
     Protocol untuk wrapper LLM guna memastikan decoupling total 
@@ -25,20 +22,6 @@ class LLMModelProtocol(Protocol):
 
 
 class BaseAgent(ABC):
-    """
-    Abstract Base Class untuk seluruh AI Agent di dalam sistem.
-
-    Responsibility
-    --------------
-    - Mengelola instansiasi PromptBuilder dan ToolRegistry.
-    - Menyediakan antarmuka standar untuk eksekusi tugas agen (run).
-    - Menangani alur penyiapan prompt secara otomatis dengan caching internal.
-    - Mengisolasi pemanggilan LLM melalui LLMModelProtocol.
-
-    Tidak bertanggung jawab terhadap:
-    - Logika spesifik masing-masing domain agen (budget, planning, dll).
-    - Koneksi HTTP langsung ke penyedia LLM (Prinsip 12).
-    """
 
     def __init__(
         self,
@@ -58,9 +41,7 @@ class BaseAgent(ABC):
         self.prompt_builder = prompt_builder
         self.llm_model = llm_model
         self.tools = tool_registry or ToolRegistry()
-        
-        # Caching prompt di tingkat memori (Prinsip 24: Performance Awareness)
-        # Menghindari operasi I/O-blocking disk berulang pada saat runtime.
+
         self._cached_task_prompt: str | None = None
 
     @property
@@ -95,8 +76,6 @@ class BaseAgent(ABC):
         history: list[str] | None = None,
     ) -> str:
         """
-        Menyusun prompt lengkap menggunakan PromptBuilder (Prinsip 1).
-
         Args:
             question: Pertanyaan atau instruksi user terkini.
             documents: Dokumen konteks hasil retrieval (jika ada).
@@ -118,8 +97,6 @@ class BaseAgent(ABC):
 
     def execute_tool(self, tool_name: str, **kwargs: Any) -> Any:
         """
-        Helper terisolasi untuk mengeksekusi tool yang terdaftar (Prinsip 12, 16).
-
         Args:
             tool_name: Nama tool yang ingin dieksekusi.
             **kwargs: Parameter dinamis untuk kebutuhan eksekusi tool.
@@ -142,8 +119,6 @@ class BaseAgent(ABC):
         history: list[str] | None = None,
     ) -> str:
         """
-        Alur eksekusi utama agen untuk reasoning (Prinsip 15).
-
         Args:
             question: Pertanyaan atau instruksi user.
             documents: Konteks dokumen RAG.
@@ -162,7 +137,6 @@ class BaseAgent(ABC):
             logger.info(f"[{self.name}] Mengirimkan prompt reasoning ke LLM.")
             return self.llm_model.generate(compiled_prompt)
         except Exception as exc:
-            # Fail Gracefully & Log detailed trace (Prinsip 8 & 10)
             logger.exception(f"[{self.name}] Kegagalan fatal saat menghubungi LLM.")
             return (
                 f"Asisten [{self.name}] mengalami kendala saat memproses permintaan Anda. "

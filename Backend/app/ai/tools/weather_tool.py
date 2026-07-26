@@ -20,23 +20,6 @@ from app.repositories.weather_repository import (
 
 
 class WeatherTool(BaseTool):
-    """
-    Weather Tool.
-
-    Bertanggung jawab terhadap:
-
-    - Mengambil data cuaca dari OpenWeather API
-    - Melakukan cache ke database
-    - Mengambil cache apabila masih valid
-    - Logging proses tool
-
-    Tidak bertanggung jawab terhadap:
-
-    - Prompt
-    - RAG
-    - LangGraph
-    - Tool Registry
-    """
 
     NAME = "weather"
 
@@ -83,10 +66,6 @@ class WeatherTool(BaseTool):
             WeatherRepository()
         )
 
-    # =====================================================
-    # METADATA
-    # =====================================================
-
     @property
     def name(
         self,
@@ -101,24 +80,12 @@ class WeatherTool(BaseTool):
 
         return self.DESCRIPTION
     
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
-
     def _get_cached_weather(
         self,
         db: Session,
         city: str,
         country: str,
     ) -> WeatherCache | None:
-        """
-        Mengambil weather cache terbaru berdasarkan
-        kota dan negara.
-
-        Returns:
-            WeatherCache jika tersedia,
-            None apabila belum ada cache.
-        """
 
         return self.weather_repository.get_latest_weather(
             db=db,
@@ -131,18 +98,6 @@ class WeatherTool(BaseTool):
         city: str,
         country: str,
     ) -> tuple[str, Decimal, Decimal]:
-        """
-        Mengambil data cuaca terbaru dari
-        OpenWeather API.
-
-        Returns:
-            (
-                weather, temperature, humidity,
-            )
-
-        Raises:
-            RuntimeError: Jika request API gagal.
-        """
 
         logger.info(
             f"Fetching weather from OpenWeather "
@@ -209,11 +164,6 @@ class WeatherTool(BaseTool):
         temperature: Decimal,
         humidity: Decimal,
     ) -> WeatherCache:
-        """
-        Menyimpan weather baru ke database.
-
-        Returns: WeatherCache yang telah disimpan.
-        """
 
         cache = WeatherCache(
             city=city,
@@ -241,10 +191,6 @@ class WeatherTool(BaseTool):
 
         return cache
     
-        # =====================================================
-        # PUBLIC METHODS
-        # =====================================================
-
     def run(
         self,
         **kwargs: Any,
@@ -252,27 +198,6 @@ class WeatherTool(BaseTool):
 
         city = kwargs["city"]
         country = kwargs["country"]
-
-        """
-        Mengambil informasi cuaca.
-
-        Workflow:
-
-            1. Cek cache.
-            2. Jika cache masih valid, gunakan cache.
-            3. Jika tidak, ambil dari OpenWeather.
-            4. Simpan cache baru.
-            5. Return hasil.
-
-        Args:
-            city: Nama kota.
-
-            country:
-                Kode negara (ISO 3166-1 Alpha-2),
-                misalnya: ID, JP, SG, AU
-
-        Returns: Dictionary hasil cuaca.
-        """
 
         logger.info(
             f"WeatherTool started "

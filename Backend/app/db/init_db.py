@@ -4,11 +4,6 @@ from app.db.session import engine
 
 
 def init_database() -> None:
-    """
-    Test database connection saat aplikasi startup.
-    Tidak membuat tabel.
-    Migration akan dikelola oleh Alembic.
-    """
 
     with engine.connect() as connection:
         connection.execute(text("SELECT 1"))

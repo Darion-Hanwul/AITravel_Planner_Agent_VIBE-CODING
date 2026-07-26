@@ -24,18 +24,6 @@ from app.services.base_service import BaseService
 
 
 class CalendarService(BaseService):
-    """
-    Business logic untuk Calendar Event.
-
-    Bertanggung jawab terhadap:
-
-    - Create Calendar Event
-    - Update Calendar Event
-    - Delete Calendar Event
-    - Get Calendar Event
-    - Get Calendar by Date
-    - Reminder Event
-    """
 
     def __init__(
         self,
@@ -46,22 +34,10 @@ class CalendarService(BaseService):
 
         self.calendar_repository = CalendarRepository()
 
-    # ======================================================
-    # PRIVATE HELPERS
-    # ======================================================
-
     def _get_event(
         self,
         event_id: UUID,
     ) -> CalendarEvent:
-        """
-        Mengambil calendar event berdasarkan ID.
-
-        Raises
-        ------
-        ResourceNotFoundError
-        """
-
         event = self.calendar_repository.get_by_id(
             self.db,
             event_id,
@@ -80,11 +56,6 @@ class CalendarService(BaseService):
         start_time: time,
         end_time: time,
     ) -> None:
-        """
-        Memastikan jam selesai tidak
-        lebih awal dari jam mulai.
-        """
-
         if end_time <= start_time:
 
             raise ValidationError(
@@ -96,15 +67,6 @@ class CalendarService(BaseService):
         start_date: date,
         end_date: date,
     ) -> None:
-        """
-        Memastikan rentang tanggal valid.
-
-        Raises
-        ------
-        ValidationError
-            Jika end_date lebih awal dari start_date.
-        """
-
         if end_date < start_date:
 
             raise ValidationError(
@@ -115,26 +77,14 @@ class CalendarService(BaseService):
         self,
         event: CalendarEvent,
     ) -> CalendarEventResponse:
-        """
-        Mapping ORM menjadi Response Schema.
-        """
-
         return CalendarEventResponse.model_validate(
             event,
         )
     
-    # ======================================================
-    # PUBLIC METHODS
-    # ======================================================
-
     def create_event(
         self,
         data: CalendarEventCreate,
     ) -> CalendarEventResponse:
-        """
-        Membuat Calendar Event baru.
-        """
-
         self._validate_time(
             data.start_time,
             data.end_time,
@@ -176,9 +126,6 @@ class CalendarService(BaseService):
         self,
         event_id: UUID,
     ) -> CalendarEventResponse:
-        """
-        Mengambil satu Calendar Event.
-        """
 
         event = self._get_event(
             event_id,
@@ -193,10 +140,6 @@ class CalendarService(BaseService):
         event_id: UUID,
         data: CalendarEventUpdate,
     ) -> CalendarEventResponse:
-        """
-        Mengubah Calendar Event.
-        """
-
         event = self._get_event(
             event_id,
         )
@@ -252,10 +195,6 @@ class CalendarService(BaseService):
         self,
         event_id: UUID,
     ) -> None:
-        """
-        Menghapus Calendar Event.
-        """
-
         event = self._get_event(
             event_id,
         )
@@ -279,10 +218,6 @@ class CalendarService(BaseService):
         self,
         event_date: date,
     ) -> list[CalendarEventResponse]:
-        """
-        Mengambil seluruh event pada tanggal tertentu.
-        """
-
         events = self.calendar_repository.get_by_date(
             self.db,
             event_date,
@@ -300,10 +235,6 @@ class CalendarService(BaseService):
         start_date: date,
         end_date: date,
     ) -> list[CalendarEventResponse]:
-        """
-        Mengambil seluruh event dalam rentang tanggal.
-        """
-
         self._validate_date_range(
             start_date,
             end_date,
@@ -325,9 +256,6 @@ class CalendarService(BaseService):
     def get_reminder_events(
         self,
     ) -> list[CalendarEventResponse]:
-        """
-        Mengambil seluruh event yang memiliki reminder.
-        """
 
         events = self.calendar_repository.get_reminder_events(
             self.db,

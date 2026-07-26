@@ -8,26 +8,6 @@ from app.ai.services.retriever_service import RetrieverService
 
 
 class RAGService:
-    """
-    Retrieval-Augmented Generation Service.
-
-    Responsibility
-    --------------
-
-    - Retrieve relevant documents
-    - Build prompt
-    - Invoke LLM
-    - Return AI response
-
-    Tidak bertanggung jawab terhadap:
-
-    - Crawling
-    - Chunking
-    - Embedding
-    - Indexing
-    - Weaviate configuration
-    - LangGraph workflow
-    """
 
     def __init__(
         self,
@@ -43,18 +23,10 @@ class RAGService:
 
         self.prompt_builder = PromptBuilder()
 
-    # =====================================================
-    # PRIVATE
-    # =====================================================
-
     def _extract_response(
         self,
         response: AIMessage,
     ) -> str:
-        """
-        Mengubah AIMessage menjadi plain string.
-        """
-
         if isinstance(
             response.content,
             str,
@@ -72,10 +44,6 @@ class RAGService:
         history: list[str] | None,
         top_k: int | None,
     ) -> str:
-        """
-        Melakukan retrieval kemudian membangun prompt.
-        """
-
         documents = self.retriever.hybrid_search(
             query=question,
             limit=top_k,
@@ -89,21 +57,12 @@ class RAGService:
             history=history,
         )
 
-    # =====================================================
-    # PUBLIC
-    # =====================================================
-
     def ask(
         self,
         question: str,
         history: list[str] | None = None,
         top_k: int | None = None,
     ) -> str:
-        """
-        Menjawab pertanyaan menggunakan
-        Retrieval-Augmented Generation.
-        """
-
         prompt = self._build_prompt(
             question=question,
             history=history,
@@ -119,8 +78,5 @@ class RAGService:
         )
 
     def close(self) -> None:
-        """
-        Menutup seluruh resource yang digunakan
-        oleh RAGService.
-        """
+
         self.retriever.close()

@@ -14,10 +14,6 @@ class CurrencyRepository(
     def __init__(self) -> None:
         super().__init__(CurrencyHistory)
 
-    # =====================================================
-    # GET LATEST EXCHANGE RATE
-    # =====================================================
-
     def get_latest_rate(
         self,
         db: Session,
@@ -38,10 +34,6 @@ class CurrencyRepository(
         )
 
         return db.scalar(stmt)
-
-    # =====================================================
-    # GET EXCHANGE RATE HISTORY
-    # =====================================================
 
     def get_history(
         self,

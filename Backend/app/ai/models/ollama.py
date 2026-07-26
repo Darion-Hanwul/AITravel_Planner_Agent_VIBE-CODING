@@ -1,12 +1,3 @@
-"""
-Factory untuk seluruh model Ollama yang digunakan
-oleh TravelPlannerAgent.
-
-Seluruh AI component harus mengambil model
-melalui class ini agar konfigurasi berada
-di satu tempat.
-"""
-
 from langchain_ollama import (
     ChatOllama,
     OllamaEmbeddings,
@@ -28,16 +19,6 @@ class OllamaModel:
         cls,
         temperature: float | None = None,
     ) -> ChatOllama:
-        """
-        Membuat ChatOllama instance.
-
-        Args:
-            temperature:
-                Override temperature bawaan.
-
-        Returns:
-            ChatOllama
-        """
 
         return ChatOllama(
             model=cls.CHAT_MODEL,
@@ -53,12 +34,6 @@ class OllamaModel:
     def get_embedding_model(
         cls,
     ) -> OllamaEmbeddings:
-        """
-        Membuat Ollama Embedding Model.
-
-        Returns:
-            OllamaEmbeddings
-        """
 
         return OllamaEmbeddings(
             model=cls.EMBEDDING_MODEL,

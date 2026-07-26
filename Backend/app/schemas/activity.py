@@ -4,11 +4,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Base
-# ==========================================================
-
 class ActivityBase(BaseModel):
 
     place_name: str = Field(..., min_length=2, max_length=200)
@@ -27,18 +22,8 @@ class ActivityBase(BaseModel):
 
     notes: str | None = None
 
-
-# ==========================================================
-# Create
-# ==========================================================
-
 class ActivityCreate(ActivityBase):
     pass
-
-
-# ==========================================================
-# Update
-# ==========================================================
 
 class ActivityUpdate(BaseModel):
 
@@ -57,11 +42,6 @@ class ActivityUpdate(BaseModel):
     longitude: Decimal | None = None
 
     notes: str | None = None
-
-
-# ==========================================================
-# Response
-# ==========================================================
 
 class ActivityResponse(ActivityBase):
 

@@ -28,9 +28,7 @@ class TokenResponse(BaseModel):
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def signup(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
-    """
-    Mendaftarkan pengguna baru ke dalam sistem aplikasi (Sign Up).
-    """
+
     logger.info(f"[Auth API] Memproses pendaftaran pengguna baru dengan email: {user_in.email}")
     
     existing_user = db.query(User).filter(User.email == user_in.email).first()
@@ -71,9 +69,7 @@ def signin(
     form_data: OAuth2PasswordRequestForm = Depends(), 
     db: Session = Depends(get_db)
 ) -> Any:
-    """
-    Autentikasi kredensial pengguna untuk masuk ke dalam sistem (Sign In / Login).
-    """
+
     logger.info(f"[Auth API] Memproses autentikasi masuk untuk email: {form_data.username}")
     
     user = db.query(User).filter(User.email == form_data.username).first()

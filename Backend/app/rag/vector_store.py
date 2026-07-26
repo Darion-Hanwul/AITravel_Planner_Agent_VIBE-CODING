@@ -18,10 +18,6 @@ class WeaviateVectorStore:
 
         self._connect()
 
-    # ==========================================================
-    # CONNECTION
-    # ==========================================================
-
     def _connect(self) -> None:
 
         try:
@@ -53,10 +49,6 @@ class WeaviateVectorStore:
             self.client = None
             self.collection = None
 
-    # ==========================================================
-    # ENSURE COLLECTION
-    # ==========================================================
-
     def _ensure_collection(self) -> None:
 
         if self.client is None:
@@ -75,7 +67,7 @@ class WeaviateVectorStore:
                 print(
                     f"[Weaviate] Collection "
                     f"'{self.collection_name}' "
-                    "belum tersedia."
+                    f"belum tersedia."
                 )
 
                 self.collection = None
@@ -91,7 +83,7 @@ class WeaviateVectorStore:
             print(
                 f"[Weaviate] Collection "
                 f"'{self.collection_name}' "
-                "sudah tersedia."
+                f"sudah tersedia."
             )
 
         except Exception as e:
@@ -102,10 +94,6 @@ class WeaviateVectorStore:
             )
 
             self.collection = None
-
-    # ==========================================================
-    # NORMALIZE LIMIT
-    # ==========================================================
 
     def _normalize_limit(
         self,
@@ -143,10 +131,32 @@ class WeaviateVectorStore:
             normalized_limit = 20
 
         return normalized_limit
+    
+    def add_document_chunk(
+        self,
+        content: str,
+        embedding: List[float],
+        meta_data: Dict[str, Any],
+    ) -> bool:
+        if self.client is None or self.collection is None:
+            print("[Weaviate] Gagal menyimpan chunk: Client atau Collection tidak tersedia.")
+            return False
 
-    # ==========================================================
-    # SEARCH SIMILAR CHUNKS
-    # ==========================================================
+        try:
+            # Menggunakan batch dynamic untuk memasukkan single object secara aman
+            with self.collection.batch.dynamic() as batch:
+                batch.add_object(
+                    properties={
+                        "content": content,
+                        **meta_data
+                    },
+                    vector=embedding
+                )
+            return True
+
+        except Exception as e:
+            print(f"[Weaviate Insert Error] Gagal menyimpan chunk: {str(e)}")
+            return False
 
     def search_similar_chunks(
         self,
@@ -284,10 +294,6 @@ class WeaviateVectorStore:
             )
 
             return []
-
-    # ==========================================================
-    # CLOSE CONNECTION
-    # ==========================================================
 
     def close(self) -> None:
 

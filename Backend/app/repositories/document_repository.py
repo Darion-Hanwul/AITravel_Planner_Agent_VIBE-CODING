@@ -13,10 +13,6 @@ class DocumentRepository(BaseRepository[Document]):
     def __init__(self) -> None:
         super().__init__(Document)
 
-    # =====================================================
-    # GET DOCUMENT BY TITLE
-    # =====================================================
-
     def get_by_title(
         self,
         db: Session,
@@ -33,10 +29,6 @@ class DocumentRepository(BaseRepository[Document]):
 
         return db.scalar(stmt)
 
-    # =====================================================
-    # GET ALL DOCUMENTS
-    # =====================================================
-
     def get_all_documents(
         self,
         db: Session,
@@ -52,10 +44,6 @@ class DocumentRepository(BaseRepository[Document]):
         return list(
             db.scalars(stmt)
         )
-
-    # =====================================================
-    # GET DOCUMENTS BY SOURCE
-    # =====================================================
 
     def get_by_source(
         self,
@@ -76,10 +64,6 @@ class DocumentRepository(BaseRepository[Document]):
         return list(
             db.scalars(stmt)
         )
-
-    # =====================================================
-    # DELETE DOCUMENT
-    # =====================================================
 
     def delete_document(
         self,

@@ -41,22 +41,17 @@ class TravelPlannerWorkflow:
         """
         logger.info("Memulai konfigurasi topologi LangGraph.")
 
-        # 1. Daftarkan semua Node ke dalam Graph Builder
         self._graph_builder.add_node("research", self.nodes.research_node)
         self._graph_builder.add_node("budget", self.nodes.budget_node)
         self._graph_builder.add_node("schedule", self.nodes.schedule_node)
         self._graph_builder.add_node("safety", self.nodes.safety_node)
         self._graph_builder.add_node("planner", self.nodes.planner_node)
 
-        # 2. Atur Aliran Paralel dari START (Prinsip 21 & 24)
-        # Keempat agen spesialis akan mulai bekerja secara bersamaan (Asinkron/Paralel)
         self._graph_builder.add_edge(START, "research")
         self._graph_builder.add_edge(START, "budget")
         self._graph_builder.add_edge(START, "schedule")
         self._graph_builder.add_edge(START, "safety")
 
-        # 3. Definisikan Aliran Penggabungan (Join/Merge)
-        # Setelah semua agen spesialis selesai, arahkan ke Planner secara kondisional (Prinsip 14)
         self._graph_builder.add_conditional_edges(
             "research",
             should_continue_planning,
@@ -90,7 +85,6 @@ class TravelPlannerWorkflow:
             }
         )
 
-        # 4. Aliran Akhir dari Planner ke END
         self._graph_builder.add_edge("planner", END)
 
         logger.info("Topologi LangGraph berhasil dikonfigurasi.")

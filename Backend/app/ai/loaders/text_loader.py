@@ -5,26 +5,6 @@ from langchain_core.documents import Document
 
 
 class TextLoader:
-    """
-    Loader untuk membersihkan HTML.
-
-    Responsibility:
-
-    - HTML Parsing
-    - HTML Cleaning
-    - Normalisasi whitespace
-
-    Tidak bertanggung jawab terhadap:
-
-    - HTTP Request
-    - Chunking
-    - Embedding
-    - RAG
-    """
-
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
 
     def _clean_html(
         self,
@@ -61,10 +41,6 @@ class TextLoader:
         return " ".join(
             text.split()
         )
-
-    # =====================================================
-    # PUBLIC METHODS
-    # =====================================================
 
     def transform(
         self,

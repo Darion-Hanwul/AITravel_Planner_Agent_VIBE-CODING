@@ -5,7 +5,6 @@ import httpx
 
 from app.config.settings import settings
 
-
 class OllamaService:
 
     def __init__(self) -> None:
@@ -28,7 +27,7 @@ class OllamaService:
         num_predict: int = 6789,
         temperature: float = 0.4,
         top_p: float = 0.9,
-        num_ctx: int = 2048,
+        num_ctx: int = 8192,
         keep_alive: str = "30m",
         timeout: Optional[float] = 300.0,
     ) -> Dict[str, Any]:
@@ -69,10 +68,10 @@ class OllamaService:
     async def generate_stream(
         self,
         prompt: str,
-        num_predict: int = 512,
+        num_predict: int = 6792,  
         temperature: float = 0.4,
         top_p: float = 0.9,
-        num_ctx: int = 2048,
+        num_ctx: int = 8192,     
         keep_alive: str = "30m",
         timeout: Optional[float] = 600.0,
     ) -> AsyncGenerator[str, None]:

@@ -4,7 +4,6 @@ import sys
 from app.config.settings import settings
 from app.rag.pipeline import RagPipeline
 
-
 def print_config() -> None:
     print("=" * 60)
     print(" BACKEND RAG STREAMING SANDBOX ")
@@ -14,7 +13,6 @@ def print_config() -> None:
     print("[i] Ollama Model :", settings.OLLAMA_MODEL)
 
     print("=" * 60)
-
 
 async def main() -> None:
 

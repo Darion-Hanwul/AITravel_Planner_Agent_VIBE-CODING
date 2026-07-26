@@ -9,20 +9,6 @@ from app.ai.models.retrieved_document import RetrievedDocument
 
 
 class PlannerAgent(BaseAgent):
-    """
-    PlannerAgent bertindak sebagai koordinator utama (Orchestrator).
-    Bertanggung jawab mengonsolidasikan analisis dari seluruh agen spesialis
-    menjadi satu proposal rencana perjalanan yang padu, estetik, dan harmonis (Prinsip 1, 19).
-
-    Responsibility
-    --------------
-    - Menggabungkan laporan riset, anggaran biaya, jadwal harian, dan berkas keselamatan.
-    - Menyelaraskan informasi yang bertentangan (misal atraksi di luar anggaran atau di luar jam operasional).
-
-    Tidak bertanggung jawab terhadap:
-    - Melakukan pemanggilan database SQL secara langsung (Prinsip 2).
-    - Melakukan crawling atau koneksi eksternal langsung (Prinsip 12).
-    """
 
     def __init__(
         self,
@@ -57,8 +43,6 @@ class PlannerAgent(BaseAgent):
         documents: list[RetrievedDocument] | None = None,
     ) -> str:
         """
-        Mengompilasi semua laporan agen menjadi rancangan akhir terintegrasi (Prinsip 19).
-
         Args:
             destination: Nama kota/negara tujuan utama liburan.
             research_report: Laporan teks komprehensif dari ResearchAgent.

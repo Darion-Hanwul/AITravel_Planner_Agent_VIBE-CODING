@@ -3,10 +3,6 @@ from app.ai.sources.source import Source
 
 TRAVEL_SOURCES: list[Source] = [
 
-    # =====================================================
-    # WIKIVOYAGE
-    # =====================================================
-
     Source(
         name="Wikivoyage Japan",
         category="travel",

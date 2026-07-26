@@ -11,23 +11,6 @@ from app.core.logger import logger
 
 
 class WebLoader:
-    """
-    Asynchronous Web Loader.
-
-    Bertanggung jawab terhadap:
-
-    - HTTP Request
-    - Retry
-    - HTML Cleaning
-    - Convert menjadi LangChain Document
-
-    Tidak bertanggung jawab terhadap:
-
-    - Chunking
-    - Embedding
-    - Weaviate
-    - RAG
-    """
 
     DEFAULT_HEADERS = {
         "User-Agent": (
@@ -44,10 +27,6 @@ class WebLoader:
 
         self.timeout = timeout
         self.max_retries = max_retries
-
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
 
     async def _fetch(
         self,
@@ -123,10 +102,6 @@ class WebLoader:
                 "url": url,
             },
         )
-
-    # =====================================================
-    # PUBLIC METHODS
-    # =====================================================
 
     async def load(
         self,

@@ -9,20 +9,6 @@ from app.ai.models.retrieved_document import RetrievedDocument
 
 
 class SafetyAgent(BaseAgent):
-    """
-    SafetyAgent bertanggung jawab melakukan analisis risiko, travel advisory,
-    kebijakan visa, larangan adat istiadat setempat, serta keamanan destinasi (Prinsip 1).
-
-    Responsibility
-    --------------
-    - Memberikan info visa, asuransi wajib, dan vaksinasi yang dibutuhkan.
-    - Menganalisis potensi bencana alam lokal atau isu keamanan regional terkini.
-
-    Tidak bertanggung jawab terhadap:
-    - Memilih hotel atau restoran terbaik (tugas ResearchAgent).
-    - Memotong anggaran biaya belanja (tugas BudgetAgent).
-    """
-
     def __init__(
         self,
         *,
@@ -53,8 +39,6 @@ class SafetyAgent(BaseAgent):
         documents: list[RetrievedDocument] | None = None,
     ) -> str:
         """
-        Mengevaluasi tingkat keamanan dan kepatuhan hukum legalitas di negara tujuan.
-
         Args:
             destination: Nama negara/kota tujuan.
             user_nationality: Kebangsaan paspor milik pengguna (untuk validasi visa).

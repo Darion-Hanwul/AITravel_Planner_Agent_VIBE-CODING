@@ -8,19 +8,6 @@ from app.ai.tools.tool_registry import ToolRegistry
 
 
 class MemoryAgent(BaseAgent):
-    """
-    MemoryAgent bertanggung jawab menganalisis riwayat percakapan secara asinkron/sinkron
-    untuk mengekstrak fakta-fakta implisit pengguna dan menyimpannya secara terpisah (Prinsip 1, 18).
-
-    Responsibility
-    --------------
-    - Mengidentifikasi preferensi tersembunyi (e.g. alergi makanan, ketertarikan museum).
-    - Memisahkan penyimpanan memori jangka panjang dari riwayat chat kasual.
-
-    Tidak bertanggung jawab terhadap:
-    - Menyimpan log obrolan mentah (tugas ChatRepository/Service).
-    """
-
     def __init__(
         self,
         *,
@@ -46,8 +33,6 @@ class MemoryAgent(BaseAgent):
 
     def extract_implicit_preferences(self, history: list[str]) -> str:
         """
-        Mengekstrak poin preferensi krusial dari histori obrolan pengguna (Prinsip 18).
-
         Args:
             history: List baris teks rekaman obrolan pengguna dan asisten.
 

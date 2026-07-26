@@ -89,9 +89,7 @@ class ModerationGuard:
         """Inisialisasi Moderation Guard."""
         logger.info("Initializing ModerationGuard.")
 
-        # =====================================
         # Threshold & Weights
-        # =====================================
         self.threshold = settings.MODERATION_THRESHOLD
         self.low_threshold = settings.MODERATION_LOW_THRESHOLD
         self.medium_threshold = settings.MODERATION_MEDIUM_THRESHOLD
@@ -103,18 +101,12 @@ class ModerationGuard:
         self.regex_early_stop = settings.MODERATION_REGEX_EARLY_STOP
         self.combined_early_stop = settings.MODERATION_COMBINED_EARLY_STOP
 
-        # =====================================
-        # Detection Rules Initialization
-        # =====================================
         self.regex_patterns = self._load_regex_patterns()
         self.keyword_groups = self._load_keyword_groups()
         self.keyword_patterns = self._compile_keyword_patterns()
 
         logger.info("ModerationGuard initialized successfully.")
 
-    # =====================================
-    # Public API
-    # =====================================
     def check(self, prompt: str) -> ModerationResult:
         
         """Memeriksa prompt pengguna terhadap seluruh kategori risiko keamanan."""
@@ -124,20 +116,16 @@ class ModerationGuard:
 
         logger.info("Executing content moderation check.")
         
-        # 1. Jalankan Regex Detection Engine
         regex_issues = self._run_regex_detection(prompt)
         
-        # Early stop check
         regex_score = sum(issue.score for issue in regex_issues)
         if regex_score >= self.regex_early_stop:
             logger.warning(f"Moderation regex early stop triggered. Score: {regex_score}")
             severity = self._determine_severity(regex_score)
             return ModerationResult(allowed=False, score=regex_score, severity=severity, issues=regex_issues)
 
-        # 2. Jalankan Keyword Detection Engine
         keyword_issues = self._run_keyword_detection(prompt)
         
-        # Gabungkan issues & hitung weighted score
         all_issues = regex_issues + keyword_issues
         total_score = self._calculate_weighted_score(regex_issues, keyword_issues)
         severity = self._determine_severity(total_score)
@@ -152,9 +140,6 @@ class ModerationGuard:
             issues=all_issues
         )
 
-    # =====================================
-    # Internal Helper Methods
-    # =====================================
     def _determine_severity(self, score: float) -> SeverityLevel:
         """Menentukan tingkat keparahan berdasarkan total risk score."""
         if score >= self.critical_threshold:
@@ -175,10 +160,7 @@ class ModerationGuard:
 
         weighted_score = (normalized_regex * self.regex_weight) + (normalized_keyword * self.keyword_weight)
         return round(float(min(weighted_score, 1.0)), 4)
-
-    # =====================================
-    # Rules Loading & Compilation
-    # =====================================
+    
     def _load_regex_patterns(self) -> dict[RiskCategory, list[re.Pattern[str]]]:
         """Memuat dan mengompilasi pola regex untuk 10 kategori risiko."""
         raw_patterns: dict[RiskCategory, list[str]] = {
@@ -296,9 +278,6 @@ class ModerationGuard:
             compiled[category] = re.compile(pattern_str, re.IGNORECASE)
         return compiled
 
-    # =====================================
-    # Detection Execution Engines
-    # =====================================
     def _run_regex_detection(self, prompt: str) -> list[ModerationIssue]:
         """Mengeksekusi pemindaian regular expression dengan penalti skor terkalibrasi."""
         issues: list[ModerationIssue] = []
@@ -366,10 +345,8 @@ class ModerationGuard:
                     )
                 )
         return issues
-
-    # =====================================
+    
     # Utilities
-    # =====================================
     def __repr__(self) -> str:
         """Representasi string resmi untuk objek ModerationGuard."""
         return (

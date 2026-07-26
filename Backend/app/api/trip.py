@@ -30,9 +30,6 @@ def get_current_user_from_token(
     token: str = Depends(oauth2_scheme),
     auth_service: AuthService = Depends(get_auth_service)
 ) -> Any:
-    """
-    Mengekstrak dan memverifikasi pengguna aktif dari token Bearer.
-    """
     try:
         return auth_service.verify_access_token(token)
     except Exception:
@@ -49,9 +46,6 @@ def create_trip(
     current_user: Any = Depends(get_current_user_from_token),
     trip_service: TripService = Depends(get_trip_service),
 ) -> Any:
-    """
-    Membuat rencana perjalanan (Trip) baru untuk pengguna aktif.
-    """
     logger.info(f"[Trip API] User ID: {current_user.id} merencanakan trip baru ke {data.destination}")
     try:
         return trip_service.create_trip(user_id=current_user.id, data=data)
@@ -64,9 +58,6 @@ def get_user_trips(
     current_user: Any = Depends(get_current_user_from_token),
     trip_service: TripService = Depends(get_trip_service),
 ) -> Any:
-    """
-    Mengambil daftar seluruh rencana perjalanan milik pengguna aktif.
-    """
     logger.info(f"[Trip API] Mengambil semua daftar trip milik User ID: {current_user.id}")
     return trip_service.get_user_trips(user_id=current_user.id)
 
@@ -77,9 +68,6 @@ def get_trip_detail(
     current_user: Any = Depends(get_current_user_from_token),
     trip_service: TripService = Depends(get_trip_service),
 ) -> Any:
-    """
-    Mengambil informasi detail lengkap sebuah Trip (termasuk TripDay dan aktivitas didalamnya).
-    """
     logger.info(f"[Trip API] Mengambil detail Trip ID: {trip_id} oleh User ID: {current_user.id}")
     try:
         # Lakukan validasi hak kepemilikan manual tingkat API jika service layer mengembalikan objek murni
@@ -102,9 +90,6 @@ def update_trip(
     current_user: Any = Depends(get_current_user_from_token),
     trip_service: TripService = Depends(get_trip_service),
 ) -> Any:
-    """
-    Memperbarui data informasi atau estimasi biaya perjalanan.
-    """
     logger.info(f"[Trip API] Memperbarui Trip ID: {trip_id} oleh User ID: {current_user.id}")
     try:
         trip_response = trip_service.get_trip(trip_id=trip_id)
@@ -127,9 +112,6 @@ def delete_trip(
     current_user: Any = Depends(get_current_user_from_token),
     trip_service: TripService = Depends(get_trip_service),
 ) -> None:
-    """
-    Menghapus rencana perjalanan tertentu secara permanen.
-    """
     logger.info(f"[Trip API] Menghapus Trip ID: {trip_id} oleh User ID: {current_user.id}")
     try:
         trip_response = trip_service.get_trip(trip_id=trip_id)
@@ -151,9 +133,6 @@ def change_trip_status(
     current_user: Any = Depends(get_current_user_from_token),
     trip_service: TripService = Depends(get_trip_service),
 ) -> Any:
-    """
-    Mengubah status perjalanan secara instan (planning, ongoing, completed, atau cancelled).
-    """
     logger.info(f"[Trip API] Mengubah status Trip ID: {trip_id} menjadi {status_enum} oleh User ID: {current_user.id}")
     try:
         trip_response = trip_service.get_trip(trip_id=trip_id)

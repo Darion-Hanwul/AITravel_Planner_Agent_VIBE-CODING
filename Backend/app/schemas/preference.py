@@ -4,11 +4,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Base Schema
-# ==========================================================
-
 class UserPreferenceBase(BaseModel):
     preferred_currency: str = Field(..., min_length=3, max_length=5)
 
@@ -23,18 +18,8 @@ class UserPreferenceBase(BaseModel):
     travel_style: str
     transportation_preference: str
 
-
-# ==========================================================
-# Create
-# ==========================================================
-
 class UserPreferenceCreate(UserPreferenceBase):
     pass
-
-
-# ==========================================================
-# Update
-# ==========================================================
 
 class UserPreferenceUpdate(BaseModel):
     preferred_currency: str | None = None
@@ -49,11 +34,6 @@ class UserPreferenceUpdate(BaseModel):
 
     travel_style: str | None = None
     transportation_preference: str | None = None
-
-
-# ==========================================================
-# Response
-# ==========================================================
 
 class UserPreferenceResponse(UserPreferenceBase):
     id: UUID

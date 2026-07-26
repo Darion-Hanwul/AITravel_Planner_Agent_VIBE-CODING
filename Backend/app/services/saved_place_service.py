@@ -22,15 +22,6 @@ from app.services.base_service import BaseService
 
 
 class SavedPlaceService(BaseService):
-    """
-    Business logic untuk Saved Place.
-
-    Bertanggung jawab terhadap:
-
-    - User Saved Places
-    - Place Management
-    - Place Search
-    """
 
     def __init__(
         self,
@@ -43,18 +34,10 @@ class SavedPlaceService(BaseService):
             SavedPlaceRepository()
         )
 
-    # ======================================================
-    # PRIVATE HELPERS
-    # ======================================================
-
     def _get_place(
         self,
         place_id: UUID,
     ) -> SavedPlace:
-        """
-        Mengambil saved place berdasarkan id.
-        """
-
         place = (
             self.saved_place_repository.get_by_id(
                 self.db,
@@ -74,26 +57,15 @@ class SavedPlaceService(BaseService):
         self,
         place: SavedPlace,
     ) -> SavedPlaceResponse:
-        """
-        Mapping ORM ke response schema.
-        """
-
         return SavedPlaceResponse.model_validate(
             place,
         )
-
-    # ======================================================
-    # PUBLIC METHODS
-    # ======================================================
-
+    
     def create_place(
         self,
         user_id: UUID,
         data: SavedPlaceCreate,
     ) -> SavedPlaceResponse:
-        """
-        Membuat saved place baru.
-        """
 
         place = SavedPlace(
             user_id=user_id,
@@ -133,10 +105,6 @@ class SavedPlaceService(BaseService):
         self,
         place_id: UUID,
     ) -> SavedPlaceResponse:
-        """
-        Mengambil satu saved place.
-        """
-
         place = self._get_place(
             place_id,
         )
@@ -149,11 +117,6 @@ class SavedPlaceService(BaseService):
         self,
         user_id: UUID,
     ) -> list[SavedPlaceResponse]:
-        """
-        Mengambil seluruh saved place
-        milik user.
-        """
-
         places = (
             self.saved_place_repository.get_by_user(
                 self.db,
@@ -173,10 +136,6 @@ class SavedPlaceService(BaseService):
         user_id: UUID,
         keyword: str,
     ) -> list[SavedPlaceResponse]:
-        """
-        Mencari saved place berdasarkan nama.
-        """
-
         places = (
             self.saved_place_repository.search_place(
                 self.db,
@@ -197,9 +156,6 @@ class SavedPlaceService(BaseService):
         place_id: UUID,
         data: SavedPlaceUpdate,
     ) -> SavedPlaceResponse:
-        """
-        Mengupdate saved place.
-        """
 
         place = self._get_place(
             place_id,
@@ -246,10 +202,6 @@ class SavedPlaceService(BaseService):
         self,
         place_id: UUID,
     ) -> None:
-        """
-        Menghapus saved place.
-        """
-
         place = self._get_place(
             place_id,
         )

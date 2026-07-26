@@ -23,21 +23,6 @@ from app.schemas.user import (
 )
 
 class UserService(BaseService):
-    """
-    User service.
-
-    Bertanggung jawab terhadap seluruh business logic
-    yang berkaitan dengan profile user.
-
-    Scope:
-
-    - User profile
-    - Avatar
-    - Preferences
-
-    Tidak menangani authentication.
-    """
-
     def __init__(
         self,
         db: Session,
@@ -50,21 +35,10 @@ class UserService(BaseService):
             UserPreferenceRepository()
         )
 
-    # ======================================================
-    # PRIVATE HELPERS
-    # ======================================================
-
     def _get_user_by_id(
         self,
         user_id: UUID,
     ) -> User:
-        """
-        Mengambil user berdasarkan ID.
-
-        Raises:
-            UserNotFoundError
-        """
-
         user = self.user_repository.get_by_id(
             self.db,
             user_id,
@@ -82,12 +56,6 @@ class UserService(BaseService):
         self,
         user_id: UUID,
     ) -> UserPreference:
-        """
-        Mengambil preference user.
-
-        Raises:
-            UserNotFoundError
-        """
 
         preference = (
             self.preference_repository.get_by_user_id(
@@ -109,10 +77,6 @@ class UserService(BaseService):
         email: str,
         current_user_id: UUID | None = None,
     ) -> None:
-        """
-        Memastikan email belum digunakan
-        oleh user lain.
-        """
 
         existing_user = (
             self.user_repository.get_by_email(
@@ -139,9 +103,6 @@ class UserService(BaseService):
         user: User,
         **kwargs,
     ) -> None:
-        """
-        Update field-field user.
-        """
 
         for field, value in kwargs.items():
 
@@ -166,25 +127,15 @@ class UserService(BaseService):
         preference: UserPreference,
         **kwargs,
     ) -> None:
-        """
-        Update seluruh field preference.
-        """
-
         self.preference_repository.update_preference(
             self.db,
             preference,
             **kwargs,
         )
+
     def _save_changes(
         self,
     ) -> None:
-        """
-        Commit current transaction.
-
-        Raises:
-            SQLAlchemyError
-        """
-
         try:
 
             self.commit()
@@ -198,15 +149,7 @@ class UserService(BaseService):
     def _rollback_transaction(
         self,
     ) -> None:
-        """
-        Rollback current transaction.
-        """
-
         self.rollback()
-
-    # ======================================================
-    # PUBLIC METHODS
-    # ======================================================
 
     from app.schemas.user import (
         UserProfileResponse,
@@ -217,10 +160,6 @@ class UserService(BaseService):
         self,
         user_id: UUID,
     ) -> UserProfileResponse:
-        """
-        Mengambil profile user beserta preference.
-        """
-
         user = self._get_user_by_id(
             user_id,
         )
@@ -248,9 +187,6 @@ class UserService(BaseService):
         user_id: UUID,
         data: UserUpdate,
     ) -> UserResponse:
-        """
-        Update profile user.
-        """
         user = self._get_user_by_id(
             user_id,
         )
@@ -291,20 +227,6 @@ class UserService(BaseService):
         user_id: UUID,
         avatar_url: str,
     ) -> UserResponse:
-        """
-        Update avatar user.
-
-        Args:
-            user_id:
-                ID user.
-
-            avatar_url:
-                URL avatar baru.
-
-        Returns:
-            UserResponse
-        """
-
         user = self._get_user_by_id(
             user_id,
         )
@@ -328,9 +250,6 @@ class UserService(BaseService):
         self,
         user_id: UUID,
     ) -> UserPreferenceResponse:
-        """
-        Mengambil preference milik user.
-        """
 
         preference = self._get_preference(
             user_id,
@@ -345,9 +264,6 @@ class UserService(BaseService):
         user_id: UUID,
         data: UserPreferenceUpdate,
     ) -> UserPreferenceResponse:
-        """
-        Update user preferences.
-        """
 
         preference = self._get_preference(
             user_id,

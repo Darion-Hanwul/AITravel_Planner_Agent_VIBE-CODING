@@ -1,12 +1,3 @@
-"""
-JWT Utilities.
-
-Seluruh operasi JWT berada pada module ini.
-
-Service Layer tidak perlu mengetahui implementasi JWT.
-Service hanya memanggil helper yang tersedia.
-"""
-
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -20,11 +11,6 @@ from app.config.settings import settings
 from app.core.exceptions import ExpiredTokenError
 from app.core.exceptions import InvalidTokenError
 
-
-# ==========================================================
-# JWT CONFIGURATION
-# ==========================================================
-
 SECRET_KEY = settings.JWT_SECRET
 
 ALGORITHM = settings.JWT_ALGORITHM
@@ -37,15 +23,7 @@ REFRESH_TOKEN_EXPIRE_DAYS = (
     settings.REFRESH_TOKEN_EXPIRE_DAYS
 )
 
-
-# ==========================================================
-# INTERNAL HELPERS
-# ==========================================================
-
 def _now() -> datetime:
-    """
-    Return current UTC datetime.
-    """
 
     return datetime.now(timezone.utc)
 
@@ -57,10 +35,6 @@ def _create_token(
     expires_delta: timedelta,
     additional_claims: dict[str, Any] | None = None,
 ) -> str:
-    """
-    Internal helper untuk membuat JWT.
-    """
-
     payload: dict[str, Any] = {
         "sub": subject,
         "type": token_type,
@@ -80,20 +54,11 @@ def _create_token(
         algorithm=ALGORITHM,
     )
 
-
-# ==========================================================
-# CREATE ACCESS TOKEN
-# ==========================================================
-
 def create_access_token(
     subject: str,
     expires_delta: timedelta | None = None,
     additional_claims: dict[str, Any] | None = None,
 ) -> str:
-    """
-    Generate access token.
-    """
-
     return _create_token(
         subject=subject,
         token_type="access",
@@ -106,17 +71,9 @@ def create_access_token(
         additional_claims=additional_claims,
     )
 
-
-# ==========================================================
-# CREATE REFRESH TOKEN
-# ==========================================================
-
 def create_refresh_token(
     subject: str,
 ) -> str:
-    """
-    Generate refresh token.
-    """
 
     return _create_token(
         subject=subject,
@@ -126,21 +83,9 @@ def create_refresh_token(
         ),
     )
 
-
-# ==========================================================
-# DECODE TOKEN
-# ==========================================================
-
 def decode_token(
     token: str,
 ) -> dict[str, Any]:
-    """
-    Decode JWT.
-
-    Raises:
-        ExpiredTokenError
-        InvalidTokenError
-    """
 
     try:
 
@@ -162,17 +107,9 @@ def decode_token(
             "Invalid token."
         ) from exc
 
-
-# ==========================================================
-# TOKEN TYPE
-# ==========================================================
-
 def get_token_type(
     token: str,
 ) -> str:
-    """
-    Return token type.
-    """
 
     payload = decode_token(
         token,
@@ -182,17 +119,9 @@ def get_token_type(
         payload["type"],
     )
 
-
-# ==========================================================
-# TOKEN SUBJECT
-# ==========================================================
-
 def get_subject(
     token: str,
 ) -> str:
-    """
-    Return JWT subject.
-    """
 
     payload = decode_token(
         token,
@@ -202,20 +131,9 @@ def get_subject(
         payload["sub"],
     )
 
-
-# ==========================================================
-# ACCESS TOKEN
-# ==========================================================
-
 def decode_access_token(
     token: str,
 ) -> dict[str, Any]:
-    """
-    Decode access token.
-
-    Raises:
-        InvalidTokenError
-    """
 
     payload = decode_token(
         token,
@@ -229,20 +147,9 @@ def decode_access_token(
 
     return payload
 
-
-# ==========================================================
-# REFRESH TOKEN
-# ==========================================================
-
 def decode_refresh_token(
     token: str,
 ) -> dict[str, Any]:
-    """
-    Decode refresh token.
-
-    Raises:
-        InvalidTokenError
-    """
 
     payload = decode_token(
         token,
@@ -255,11 +162,6 @@ def decode_refresh_token(
         )
 
     return payload
-
-
-# ==========================================================
-# BOOLEAN HELPERS
-# ==========================================================
 
 def is_access_token(
     token: str,

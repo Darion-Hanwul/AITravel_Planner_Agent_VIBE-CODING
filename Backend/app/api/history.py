@@ -24,9 +24,6 @@ def get_current_user_from_token(
     token: str = Depends(oauth2_scheme),
     auth_service: AuthService = Depends(get_auth_service)
 ) -> Any:
-    """
-    Mengekstrak dan memverifikasi pengguna aktif dari token Bearer.
-    """
     try:
         return auth_service.verify_access_token(token)
     except Exception:
@@ -44,10 +41,6 @@ def get_chat_history(
     current_user: Any = Depends(get_current_user_from_token),
     history_service: HistoryService = Depends(get_history_service),
 ) -> Any:
-    """
-    Mengambil riwayat percakapan dari sebuah sesi chat. 
-    Mendukung opsi pembatasan (limit) jumlah pesan terbaru.
-    """
     logger.info(f"[History API] Mengambil riwayat sesi {session_id} oleh User ID: {current_user.id}")
     try:
         if limit is not None:
@@ -63,9 +56,6 @@ def count_chat_messages(
     current_user: Any = Depends(get_current_user_from_token),
     history_service: HistoryService = Depends(get_history_service),
 ) -> Any:
-    """
-    Menghitung total kuantitas pesan yang tersimpan di dalam satu sesi chat.
-    """
     logger.info(f"[History API] Menghitung total pesan sesi {session_id} oleh User ID: {current_user.id}")
     try:
         total_count = history_service.count_messages(session_id=session_id)
@@ -80,9 +70,6 @@ def clear_chat_history(
     current_user: Any = Depends(get_current_user_from_token),
     history_service: HistoryService = Depends(get_history_service),
 ) -> None:
-    """
-    Membersihkan/menghapus seluruh isi riwayat pesan tanpa menghapus sesi chat itu sendiri.
-    """
     logger.info(f"[History API] Membersihkan pesan sesi {session_id} oleh User ID: {current_user.id}")
     try:
         history_service.clear_history(session_id=session_id)

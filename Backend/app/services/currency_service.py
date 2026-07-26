@@ -22,15 +22,6 @@ from app.services.base_service import BaseService
 
 
 class CurrencyService(BaseService):
-    """
-    Business logic untuk Currency.
-
-    Bertanggung jawab terhadap:
-
-    - Currency Conversion
-    - Exchange Rate History
-    - Currency Cache Management
-    """
 
     def __init__(
         self,
@@ -43,18 +34,11 @@ class CurrencyService(BaseService):
             CurrencyRepository()
         )
 
-    # ======================================================
-    # PRIVATE HELPERS
-    # ======================================================
-
     def _get_latest_rate(
         self,
         base_currency: str,
         target_currency: str,
     ) -> CurrencyHistory:
-        """
-        Mengambil exchange rate terbaru.
-        """
 
         rate = (
             self.currency_repository.get_latest_rate(
@@ -77,9 +61,6 @@ class CurrencyService(BaseService):
         amount: Decimal,
         exchange_rate: Decimal,
     ) -> Decimal:
-        """
-        Menghitung hasil konversi currency.
-        """
 
         return amount * exchange_rate
 
@@ -87,26 +68,15 @@ class CurrencyService(BaseService):
         self,
         history: CurrencyHistory,
     ) -> CurrencyHistoryResponse:
-        """
-        Mapping ORM ke response schema.
-        """
 
         return CurrencyHistoryResponse.model_validate(
             history,
         )
-
-    # ======================================================
-    # PUBLIC METHODS
-    # ======================================================
-
+    
     def convert_currency(
         self,
         data: CurrencyConvertRequest,
     ) -> CurrencyConvertResponse:
-        """
-        Melakukan currency conversion
-        menggunakan exchange rate terbaru.
-        """
 
         rate = self._get_latest_rate(
             data.base_currency,
@@ -134,12 +104,6 @@ class CurrencyService(BaseService):
         target_currency: str,
         exchange_rate: Decimal,
     ) -> CurrencyHistoryResponse:
-        """
-        Menyimpan exchange rate baru.
-
-        Data biasanya berasal dari
-        Currency Tool / External API.
-        """
 
         currency_history = CurrencyHistory(
             base_currency=base_currency,
@@ -175,9 +139,6 @@ class CurrencyService(BaseService):
         base_currency: str,
         target_currency: str,
     ) -> list[CurrencyHistoryResponse]:
-        """
-        Mengambil history exchange rate.
-        """
 
         histories = (
             self.currency_repository.get_history(

@@ -1,11 +1,3 @@
-"""
-Global Exception Handler.
-
-Menangani seluruh exception yang berasal dari
-Service Layer maupun FastAPI sehingga response
-error memiliki format yang konsisten.
-"""
-
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -22,20 +14,11 @@ from Backend.app.core.exceptions import (
 )
 from app.core.logger import logger
 
-
-# ==========================================================
-# RESPONSE HELPER
-# ==========================================================
-
 def error_response(
     status_code: int,
     code: str,
     message: str,
 ) -> JSONResponse:
-    """
-    Membuat response error dengan format yang konsisten.
-    """
-
     return JSONResponse(
         status_code=status_code,
         content={
@@ -47,21 +30,9 @@ def error_response(
         },
     )
 
-
-# ==========================================================
-# REGISTER EXCEPTION HANDLERS
-# ==========================================================
-
 def register_exception_handlers(
     app: FastAPI,
 ) -> None:
-    """
-    Mendaftarkan seluruh global exception handler.
-    """
-
-    # ======================================================
-    # APPLICATION EXCEPTION
-    # ======================================================
 
     @app.exception_handler(AppException)
     async def app_exception_handler(
@@ -105,10 +76,6 @@ def register_exception_handlers(
             message=exc.message,
         )
 
-    # ======================================================
-    # FASTAPI VALIDATION
-    # ======================================================
-
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(
         request: Request,
@@ -132,10 +99,6 @@ def register_exception_handlers(
             },
         )
 
-    # ======================================================
-    # DATABASE
-    # ======================================================
-
     @app.exception_handler(SQLAlchemyError)
     async def sqlalchemy_exception_handler(
         request: Request,
@@ -152,10 +115,6 @@ def register_exception_handlers(
             code="DATABASE_ERROR",
             message="Internal database error.",
         )
-
-    # ======================================================
-    # UNEXPECTED
-    # ======================================================
 
     @app.exception_handler(Exception)
     async def unexpected_exception_handler(

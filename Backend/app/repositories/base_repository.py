@@ -11,24 +11,12 @@ ModelType = TypeVar("ModelType", bound=Base)
 
 
 class BaseRepository(Generic[ModelType]):
-    """
-    Generic Base Repository.
-
-    Menyediakan operasi CRUD dasar.
-
-    Seluruh transaction (commit / rollback)
-    dikelola oleh Service Layer.
-    """
 
     def __init__(
         self,
         model: Type[ModelType],
     ) -> None:
         self.model = model
-
-    # ==========================================================
-    # CREATE
-    # ==========================================================
 
     def create(
         self,
@@ -37,10 +25,6 @@ class BaseRepository(Generic[ModelType]):
     ) -> ModelType:
         db.add(obj)
         return obj
-
-    # ==========================================================
-    # READ
-    # ==========================================================
 
     def get_by_id(
         self,
@@ -93,10 +77,6 @@ class BaseRepository(Generic[ModelType]):
 
         return self.get_by_id(db, id) is not None
 
-    # ==========================================================
-    # UPDATE
-    # ==========================================================
-
     def update(
         self,
         db: Session,
@@ -107,10 +87,6 @@ class BaseRepository(Generic[ModelType]):
 
         return db_obj
 
-    # ==========================================================
-    # DELETE
-    # ==========================================================
-
     def delete(
         self,
         db: Session,
@@ -118,10 +94,6 @@ class BaseRepository(Generic[ModelType]):
     ) -> None:
 
         db.delete(db_obj)
-
-    # ==========================================================
-    # SESSION HELPERS
-    # ==========================================================
 
     def flush(
         self,

@@ -66,10 +66,6 @@ class ChunkLoader:
             )
         )
 
-    # =====================================================
-    # PUBLIC METHODS
-    # =====================================================
-
     def split_document(
         self,
         document: Document,

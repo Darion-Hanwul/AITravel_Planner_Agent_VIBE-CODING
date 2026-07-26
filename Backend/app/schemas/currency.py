@@ -4,11 +4,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Currency Convert Request
-# ==========================================================
-
 class CurrencyConvertRequest(BaseModel):
 
     base_currency: str = Field(..., min_length=3, max_length=5)
@@ -16,11 +11,6 @@ class CurrencyConvertRequest(BaseModel):
     target_currency: str = Field(..., min_length=3, max_length=5)
 
     amount: Decimal = Field(..., gt=0)
-
-
-# ==========================================================
-# Currency Convert Response
-# ==========================================================
 
 class CurrencyConvertResponse(BaseModel):
 
@@ -33,11 +23,6 @@ class CurrencyConvertResponse(BaseModel):
     amount: Decimal
 
     converted_amount: Decimal
-
-
-# ==========================================================
-# Currency History
-# ==========================================================
 
 class CurrencyHistoryResponse(BaseModel):
 

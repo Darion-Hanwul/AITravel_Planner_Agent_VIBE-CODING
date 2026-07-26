@@ -3,11 +3,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Chat Session
-# ==========================================================
-
 class ChatSessionBase(BaseModel):
 
     title: str = Field(..., min_length=2, max_length=150)
@@ -38,11 +33,6 @@ class ChatSessionResponse(ChatSessionBase):
         from_attributes=True
     )
 
-
-# ==========================================================
-# Chat Message
-# ==========================================================
-
 class ChatMessageBase(BaseModel):
 
     role: str = Field(..., pattern="^(user|assistant|system)$")
@@ -66,10 +56,6 @@ class ChatMessageResponse(ChatMessageBase):
     model_config = ConfigDict(
         from_attributes=True
     )
-
-# ==========================================================
-# Detail Session
-# ==========================================================
 
 class ChatSessionDetailResponse(ChatSessionResponse):
 

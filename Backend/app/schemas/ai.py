@@ -2,21 +2,11 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-
-# ==========================================================
-# Chat Request
-# ==========================================================
-
 class AIChatRequest(BaseModel):
 
     session_id: UUID
 
     message: str = Field(..., min_length=1)
-
-
-# ==========================================================
-# AI Response
-# ==========================================================
 
 class AIChatResponse(BaseModel):
 
@@ -27,11 +17,6 @@ class AIChatResponse(BaseModel):
     sources: list[str] = []
 
     execution_time: float
-
-
-# ==========================================================
-# Planner Request
-# ==========================================================
 
 class TravelPlanRequest(BaseModel):
 
@@ -44,11 +29,6 @@ class TravelPlanRequest(BaseModel):
     budget: float
 
     currency: str
-
-
-# ==========================================================
-# Planner Response
-# ==========================================================
 
 class TravelPlanResponse(BaseModel):
 

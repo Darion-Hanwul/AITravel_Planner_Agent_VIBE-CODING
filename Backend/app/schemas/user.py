@@ -3,28 +3,15 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-# ==========================================================
-# Base Schema
-# ==========================================================
-
 class UserBase(BaseModel):
     full_name: str = Field(..., min_length=3, max_length=100)
     email: EmailStr
-
-
-# ==========================================================
-# Create
-# ==========================================================
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=100)
     model_config = ConfigDict(
         extra="forbid",
     )
-
-# ==========================================================
-# Update
-# ==========================================================
 
 class UserUpdate(BaseModel):
     full_name: str | None = Field(default=None, min_length=3, max_length=100)
@@ -33,10 +20,6 @@ class UserUpdate(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-
-# ==========================================================
-# Response
-# ==========================================================
 
 class UserResponse(UserBase):
     id: UUID
@@ -47,11 +30,6 @@ class UserResponse(UserBase):
     model_config = ConfigDict(
         from_attributes=True
     )
-
-# ==========================================================
-# USER PREFERENCE
-# ==========================================================
-
 
 class UserPreferenceBase(BaseModel):
     preferred_currency: str
@@ -66,7 +44,6 @@ class UserPreferenceBase(BaseModel):
     travel_style: str | None = None
 
     transportation_preference: str | None = None
-
 
 class UserPreferenceUpdate(BaseModel):
     preferred_currency: str | None = None

@@ -23,17 +23,6 @@ from app.schemas.chat import (
 from app.services.base_service import BaseService
 
 class ChatService(BaseService):
-    """
-    Business logic untuk Chat.
-
-    Bertanggung jawab terhadap:
-
-    - Chat Session
-    - Chat Message
-    - AI Conversation
-    - Conversation History
-    """
-
     def __init__(
         self,
         db: Session,
@@ -55,9 +44,6 @@ class ChatService(BaseService):
         self,
         session_id: UUID,
     ) -> ChatSession:
-        """
-        Mengambil chat session berdasarkan id.
-        """
 
         session = (
             self.chat_session_repository.get_by_id(
@@ -78,13 +64,6 @@ class ChatService(BaseService):
         self,
         message: str,
     ) -> str:
-        """
-        Generate judul chat.
-
-        Sementara menggunakan
-        150 karakter pertama.
-        """
-
         message = message.strip()
 
         if len(message) <= 150:
@@ -97,9 +76,6 @@ class ChatService(BaseService):
         user_id: UUID,
         title: str,
     ) -> ChatSession:
-        """
-        Membuat session baru.
-        """
 
         session = ChatSession(
             user_id=user_id,
@@ -119,9 +95,6 @@ class ChatService(BaseService):
         role: str,
         message: str,
     ) -> ChatMessage:
-        """
-        Membuat chat message.
-        """
 
         chat_message = ChatMessage(
             session_id=session_id,
@@ -140,9 +113,6 @@ class ChatService(BaseService):
         self,
         session: ChatSession,
     ) -> ChatSessionResponse:
-        """
-        Mapping ORM ke response.
-        """
 
         return ChatSessionResponse.model_validate(
             session,
@@ -152,9 +122,6 @@ class ChatService(BaseService):
         self,
         message: ChatMessage,
     ) -> ChatMessageResponse:
-        """
-        Mapping ORM ke response.
-        """
 
         return ChatMessageResponse.model_validate(
             message,
@@ -165,9 +132,6 @@ class ChatService(BaseService):
         session_id: UUID,
         message: str,
     ) -> ChatMessage:
-        """
-        Menyimpan pesan dari user.
-        """
 
         return self._create_message(
             session_id=session_id,
@@ -180,26 +144,18 @@ class ChatService(BaseService):
         session_id: UUID,
         message: str,
     ) -> ChatMessage:
-        """
-        Menyimpan jawaban AI.
-        """
 
         return self._create_message(
             session_id=session_id,
             role="assistant",
             message=message,
         )
-    
-    #PUBLIC
 
     def create_session(
         self,
         user_id: UUID,
         data: ChatSessionCreate,
     ) -> ChatSessionResponse:
-        """
-        Membuat chat session baru.
-        """
 
         try:
 
@@ -228,9 +184,6 @@ class ChatService(BaseService):
         self,
         session_id: UUID,
     ) -> ChatSessionResponse:
-        """
-        Mengambil satu chat session.
-        """
 
         session = self._get_session(
             session_id,
@@ -244,9 +197,6 @@ class ChatService(BaseService):
         self,
         user_id: UUID,
     ) -> list[ChatSessionResponse]:
-        """
-        Mengambil seluruh session milik user.
-        """
 
         sessions = (
             self.chat_session_repository.get_by_user(
@@ -267,10 +217,6 @@ class ChatService(BaseService):
         session_id: UUID,
         title: str,
     ) -> ChatSessionResponse:
-        """
-        Mengubah judul chat session.
-        """
-
         session = self._get_session(
             session_id,
         )
@@ -304,10 +250,6 @@ class ChatService(BaseService):
         self,
         session_id: UUID,
     ) -> list[ChatMessageResponse]:
-        """
-        Mengambil seluruh pesan
-        pada sebuah session.
-        """
 
         self._get_session(
             session_id,
@@ -332,12 +274,6 @@ class ChatService(BaseService):
         session_id: UUID,
         message: str,
     ) -> ChatMessageResponse:
-        """
-        Menyimpan pesan user.
-
-        AI Response akan ditambahkan
-        pada tahap integrasi LangGraph.
-        """
 
         session = self._get_session(
             session_id,
@@ -375,10 +311,6 @@ class ChatService(BaseService):
         self,
         session_id: UUID,
     ) -> None:
-        """
-        Menghapus chat session beserta
-        seluruh chat message.
-        """
 
         session = self._get_session(
             session_id,

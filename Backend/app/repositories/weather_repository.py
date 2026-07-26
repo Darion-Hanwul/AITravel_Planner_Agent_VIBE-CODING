@@ -14,10 +14,6 @@ class WeatherRepository(
     def __init__(self) -> None:
         super().__init__(WeatherCache)
 
-    # =====================================================
-    # GET LATEST WEATHER CACHE
-    # =====================================================
-
     def get_latest_weather(
         self,
         db: Session,
@@ -38,10 +34,6 @@ class WeatherRepository(
         )
 
         return db.scalar(stmt)
-
-    # =====================================================
-    # DELETE WEATHER CACHE
-    # =====================================================
 
     def delete_cache(
         self,

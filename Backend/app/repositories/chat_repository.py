@@ -17,10 +17,6 @@ class ChatSessionRepository(
     def __init__(self) -> None:
         super().__init__(ChatSession)
 
-    # =====================================================
-    # GET USER SESSIONS
-    # =====================================================
-
     def get_by_user(
         self,
         db: Session,
@@ -41,10 +37,6 @@ class ChatSessionRepository(
             db.scalars(stmt)
         )
 
-    # =====================================================
-    # GET LATEST SESSION
-    # =====================================================
-
     def get_latest_session(
         self,
         db: Session,
@@ -64,17 +56,12 @@ class ChatSessionRepository(
 
         return db.scalar(stmt)
 
-
 class ChatMessageRepository(
     BaseRepository[ChatMessage]
 ):
 
     def __init__(self) -> None:
         super().__init__(ChatMessage)
-
-    # =====================================================
-    # GET SESSION MESSAGES
-    # =====================================================
 
     def get_by_session(
         self,
@@ -95,10 +82,6 @@ class ChatMessageRepository(
         return list(
             db.scalars(stmt)
         )
-
-    # =====================================================
-    # DELETE SESSION MESSAGES
-    # =====================================================
 
     def delete_session_messages(
         self,

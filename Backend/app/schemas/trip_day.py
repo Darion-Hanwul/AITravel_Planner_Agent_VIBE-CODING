@@ -12,10 +12,8 @@ class TripDayBase(BaseModel):
 
     description: str | None = None
 
-
 class TripDayCreate(TripDayBase):
     pass
-
 
 class TripDayUpdate(BaseModel):
 
@@ -24,7 +22,6 @@ class TripDayUpdate(BaseModel):
     title: str | None = None
 
     description: str | None = None
-
 
 class TripDayResponse(TripDayBase):
 
@@ -35,7 +32,6 @@ class TripDayResponse(TripDayBase):
     model_config = ConfigDict(
         from_attributes=True
     )
-
 
 class TripDayDetailResponse(TripDayResponse):
 

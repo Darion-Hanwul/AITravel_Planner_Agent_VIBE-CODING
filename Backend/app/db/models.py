@@ -1,10 +1,3 @@
-"""
-Import seluruh SQLAlchemy models.
-
-File ini digunakan untuk memastikan seluruh model
-terdaftar pada SQLAlchemy Base.metadata.
-"""
-
 from app.models.user import User
 from app.models.preference import UserPreference
 from app.models.trip import Trip

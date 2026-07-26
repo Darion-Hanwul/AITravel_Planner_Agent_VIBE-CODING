@@ -34,19 +34,6 @@ from app.schemas.trip import (
 from app.services.base_service import BaseService
 
 class TripService(BaseService):
-    """
-    Business logic untuk seluruh proses Trip.
-
-    Bertanggung jawab terhadap:
-
-    - Create Trip
-    - Update Trip
-    - Delete Trip
-    - Trip Detail
-    - Trip Day
-    - Activity
-    - Calendar Integration
-    """
     def __init__(
         self,
         db: Session,
@@ -62,20 +49,10 @@ class TripService(BaseService):
 
         self.calendar_repository = CalendarRepository()
 
-    #PRIVATE HELPERS
-
     def _get_trip(
         self,
         trip_id: UUID,
     ) -> Trip:
-        """
-        Mengambil Trip berdasarkan ID.
-
-        Raises
-        ------
-        TripNotFoundError
-        """
-
         trip = self.trip_repository.get_by_id(
             self.db,
             trip_id,
@@ -94,10 +71,6 @@ class TripService(BaseService):
         trip: Trip,
         user_id: UUID,
     ) -> None:
-        """
-        Memastikan user adalah pemilik trip.
-        """
-
         if trip.user_id != user_id:
 
             raise TripValidationError(
@@ -108,10 +81,6 @@ class TripService(BaseService):
         self,
         trip: Trip,
     ) -> None:
-        """
-        Memastikan trip masih dapat diubah.
-        """
-
         if trip.status in (
             TripStatus.COMPLETED.value,
             TripStatus.CANCELLED.value,
@@ -125,9 +94,6 @@ class TripService(BaseService):
         self,
         budget: Decimal,
     ) -> None:
-        """
-        Memastikan budget valid.
-        """
 
         if budget < 0:
 
@@ -140,9 +106,6 @@ class TripService(BaseService):
         start_date: date,
         end_date: date,
     ) -> None:
-        """
-        Memastikan rentang tanggal valid.
-        """
 
         if end_date < start_date:
 
@@ -155,10 +118,6 @@ class TripService(BaseService):
         trip: Trip,
         status: TripStatus,
     ) -> None:
-        """
-        Mengubah status trip.
-        """
-
         trip.status = status.value
 
         self.trip_repository.update(
@@ -170,24 +129,15 @@ class TripService(BaseService):
         self,
         trip: Trip,
     ) -> TripResponse:
-        """
-        Mapping ORM menjadi Response Schema.
-        """
-
         return TripResponse.model_validate(
             trip,
         )
-
-    #PUBLIC METHODS
 
     def create_trip(
         self,
         user_id: UUID,
         data: TripCreate,
     ) -> TripResponse:
-        """
-        Membuat trip baru.
-        """
 
         self._validate_budget(
             data.budget,
@@ -235,9 +185,6 @@ class TripService(BaseService):
         self,
         trip_id: UUID,
     ) -> TripResponse:
-        """
-        Mengambil satu trip.
-        """
 
         trip = self._get_trip(
             trip_id,
@@ -251,9 +198,6 @@ class TripService(BaseService):
         self,
         user_id: UUID,
     ) -> list[TripResponse]:
-        """
-        Mengambil seluruh trip milik user.
-        """
 
         trips = self.trip_repository.get_by_user(
             self.db,
@@ -272,10 +216,6 @@ class TripService(BaseService):
         trip_id: UUID,
         data: TripUpdate,
     ) -> TripResponse:
-        """
-        Mengubah informasi trip.
-        """
-
         trip = self._get_trip(
             trip_id,
         )
@@ -349,10 +289,6 @@ class TripService(BaseService):
         self,
         trip_id: UUID,
     ) -> None:
-        """
-        Menghapus trip.
-        """
-
         trip = self._get_trip(
             trip_id,
         )
@@ -377,9 +313,6 @@ class TripService(BaseService):
         trip_id: UUID,
         status: TripStatus,
     ) -> TripResponse:
-        """
-        Mengubah status trip.
-        """
 
         trip = self._get_trip(
             trip_id,
@@ -414,9 +347,6 @@ class TripService(BaseService):
         self,
         trip_id: UUID,
     ) -> Decimal:
-        """
-        Menghitung total estimasi biaya seluruh activity.
-        """
 
         trip = self.trip_repository.get_trip_detail(
             self.db,
@@ -458,9 +388,6 @@ class TripService(BaseService):
         self,
         trip_day: TripDay,
     ) -> TripDay:
-        """
-        Membuat hari baru pada trip.
-        """
 
         self.trip_day_repository.create(
             self.db,
@@ -479,9 +406,6 @@ class TripService(BaseService):
         self,
         activity: Activity,
     ) -> Activity:
-        """
-        Menambahkan activity ke Trip Day.
-        """
 
         self.activity_repository.create(
             self.db,
@@ -500,9 +424,6 @@ class TripService(BaseService):
         self,
         activity: Activity,
     ) -> None:
-        """
-        Menghapus activity.
-        """
 
         self.activity_repository.delete(
             self.db,
@@ -515,11 +436,6 @@ class TripService(BaseService):
         self,
         trip_id: UUID,
     ) -> TripDetailResponse:
-        """
-        Mengambil detail lengkap trip beserta
-        TripDay, Activity, dan Calendar.
-        """
-
         trip = self.trip_repository.get_trip_detail(
             self.db,
             trip_id,

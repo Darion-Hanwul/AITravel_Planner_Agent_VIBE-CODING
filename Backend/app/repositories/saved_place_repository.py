@@ -14,10 +14,6 @@ class SavedPlaceRepository(
     def __init__(self) -> None:
         super().__init__(SavedPlace)
 
-    # =====================================================
-    # GET USER SAVED PLACES
-    # =====================================================
-
     def get_by_user(
         self,
         db: Session,
@@ -37,10 +33,6 @@ class SavedPlaceRepository(
         return list(
             db.scalars(stmt)
         )
-
-    # =====================================================
-    # SEARCH PLACE
-    # =====================================================
 
     def search_place(
         self,

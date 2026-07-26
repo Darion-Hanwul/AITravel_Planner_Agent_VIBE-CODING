@@ -30,9 +30,6 @@ def get_current_user_from_token(
     token: str = Depends(oauth2_scheme),
     auth_service: AuthService = Depends(get_auth_service)
 ) -> Any:
-    """
-    Mengekstrak dan memverifikasi pengguna aktif dari token Bearer.
-    """
     try:
         return auth_service.verify_access_token(token)
     except Exception:
@@ -49,9 +46,6 @@ def create_session(
     current_user: Any = Depends(get_current_user_from_token),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> Any:
-    """
-    Membuat sesi percakapan baru untuk pengguna aktif.
-    """
     logger.info(f"[Chat API] Membuat sesi baru untuk User ID: {current_user.id}")
     return chat_service.create_session(user_id=current_user.id, data=data)
 
@@ -61,9 +55,6 @@ def get_user_sessions(
     current_user: Any = Depends(get_current_user_from_token),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> Any:
-    """
-    Mengambil semua daftar sesi chat milik pengguna aktif.
-    """
     logger.info(f"[Chat API] Mengambil semua sesi chat milik User ID: {current_user.id}")
     return chat_service.get_user_sessions(user_id=current_user.id)
 
@@ -74,9 +65,6 @@ def get_session_detail(
     current_user: Any = Depends(get_current_user_from_token),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> Any:
-    """
-    Mengambil detail sesi chat spesifik beserta daftar pesan di dalamnya.
-    """
     logger.info(f"[Chat API] Mengambil detail sesi {session_id} untuk User ID: {current_user.id}")
     try:
         session = chat_service.get_session(session_id=session_id)
@@ -100,9 +88,6 @@ def rename_session(
     current_user: Any = Depends(get_current_user_from_token),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> Any:
-    """
-    Mengubah judul/mengganti nama sesi chat percakapan.
-    """
     logger.info(f"[Chat API] Mengubah nama sesi {session_id} oleh User ID: {current_user.id}")
     if data.title is None:
         raise HTTPException(
@@ -121,9 +106,6 @@ def delete_session(
     current_user: Any = Depends(get_current_user_from_token),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> None:
-    """
-    Menghapus satu sesi chat beserta seluruh riwayat pesan di dalamnya.
-    """
     logger.info(f"[Chat API] Menghapus sesi {session_id} oleh User ID: {current_user.id}")
     try:
         chat_service.delete_session(session_id=session_id)
@@ -138,9 +120,6 @@ def send_message(
     current_user: Any = Depends(get_current_user_from_token),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> Any:
-    """
-    Mengirimkan pesan user baru ke dalam sesi chat percakapan.
-    """
     logger.info(f"[Chat API] Mengirim pesan ke sesi {session_id} oleh User ID: {current_user.id}")
     try:
         return chat_service.send_message(session_id=session_id, message=message_text)

@@ -9,19 +9,6 @@ from app.ai.models.retrieved_document import RetrievedDocument
 
 
 class ScheduleAgent(BaseAgent):
-    """
-    ScheduleAgent bertanggung jawab menyusun urutan kronologis waktu, itinerary harian,
-    dan alokasi durasi kunjungan agar logis dan efisien (Prinsip 1).
-
-    Responsibility
-    --------------
-    - Mengatur jadwal waktu per hari (itinerary pagi, siang, malam).
-    - Memastikan tidak ada jadwal yang tumpang tindih (*overlapping*).
-
-    Tidak bertanggung jawab terhadap:
-    - Menghitung kalkulasi anggaran biaya (tugas BudgetAgent).
-    - Validasi keamanan wilayah (tugas SafetyAgent).
-    """
 
     def __init__(
         self,
@@ -54,8 +41,6 @@ class ScheduleAgent(BaseAgent):
         documents: list[RetrievedDocument] | None = None,
     ) -> str:
         """
-        Menyusun rancangan linimasa waktu perjalanan harian.
-
         Args:
             destination: Nama lokasi tujuan.
             duration_days: Durasi liburan dalam hitungan hari.

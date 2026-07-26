@@ -29,9 +29,7 @@ def get_current_user_from_token(
     token: str = Depends(oauth2_scheme),
     auth_service: AuthService = Depends(get_auth_service)
 ) -> Any:
-    """
-    Mengekstrak dan memverifikasi pengguna aktif dari token Bearer.
-    """
+
     try:
         return auth_service.verify_access_token(token)
     except Exception:
@@ -48,9 +46,6 @@ def create_event(
     current_user: Any = Depends(get_current_user_from_token),
     calendar_service: CalendarService = Depends(get_calendar_service),
 ) -> Any:
-    """
-    Membuat agenda kegiatan baru pada kalender perjalanan.
-    """
     logger.info(f"[Calendar API] Membuat event baru untuk User ID: {current_user.id}")
     try:
         return calendar_service.create_event(data=data)
@@ -63,9 +58,6 @@ def get_reminder_events(
     current_user: Any = Depends(get_current_user_from_token),
     calendar_service: CalendarService = Depends(get_calendar_service),
 ) -> Any:
-    """
-    Mengambil semua daftar agenda perjalanan yang memiliki pengingat aktif (reminder=True).
-    """
     logger.info(f"[Calendar API] Mengambil semua reminder event untuk User ID: {current_user.id}")
     return calendar_service.get_reminder_events()
 
@@ -78,9 +70,6 @@ def get_events_by_date_filter(
     current_user: Any = Depends(get_current_user_from_token),
     calendar_service: CalendarService = Depends(get_calendar_service),
 ) -> Any:
-    """
-    Mengambil daftar agenda perjalanan dengan filter fleksibel (berdasarkan tanggal tunggal atau jangkauan rentang waktu).
-    """
     logger.info(f"[Calendar API] Melakukan filter agenda untuk User ID: {current_user.id}")
     
     try:
@@ -103,9 +92,6 @@ def get_event(
     current_user: Any = Depends(get_current_user_from_token),
     calendar_service: CalendarService = Depends(get_calendar_service),
 ) -> Any:
-    """
-    Mengambil informasi lengkap satu agenda kalender berdasarkan ID.
-    """
     logger.info(f"[Calendar API] Mengambil event {event_id} oleh User ID: {current_user.id}")
     try:
         return calendar_service.get_event(event_id=event_id)
@@ -120,9 +106,6 @@ def update_event(
     current_user: Any = Depends(get_current_user_from_token),
     calendar_service: CalendarService = Depends(get_calendar_service),
 ) -> Any:
-    """
-    Mengubah rincian informasi, waktu pelaksanaan, atau status pengingat agenda kalender.
-    """
     logger.info(f"[Calendar API] Memperbarui event {event_id} oleh User ID: {current_user.id}")
     try:
         return calendar_service.update_event(event_id=event_id, data=data)
@@ -138,9 +121,6 @@ def delete_event(
     current_user: Any = Depends(get_current_user_from_token),
     calendar_service: CalendarService = Depends(get_calendar_service),
 ) -> None:
-    """
-    Menghapus agenda dari kalender perjalanan secara permanen.
-    """
     logger.info(f"[Calendar API] Menghapus event {event_id} oleh User ID: {current_user.id}")
     try:
         calendar_service.delete_event(event_id=event_id)

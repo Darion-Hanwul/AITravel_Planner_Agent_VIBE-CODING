@@ -20,15 +20,6 @@ from app.services.base_service import BaseService
 
 
 class ToolLogService(BaseService):
-    """
-    Business logic untuk Tool Execution Log.
-
-    Bertanggung jawab terhadap:
-
-    - Tool Execution History
-    - Tool Monitoring
-    - Tool Result Logging
-    """
 
     def __init__(
         self,
@@ -41,18 +32,10 @@ class ToolLogService(BaseService):
             ToolLogRepository()
         )
 
-    # ======================================================
-    # PRIVATE HELPERS
-    # ======================================================
-
     def _get_log(
         self,
         log_id: UUID,
     ) -> ToolLog:
-        """
-        Mengambil tool log berdasarkan id.
-        """
-
         log = (
             self.tool_log_repository.get_by_id(
                 self.db,
@@ -72,18 +55,10 @@ class ToolLogService(BaseService):
         self,
         log: ToolLog,
     ) -> ToolLogResponse:
-        """
-        Mapping ORM ke response schema.
-        """
-
         return ToolLogResponse.model_validate(
             log,
         )
-
-    # ======================================================
-    # PUBLIC METHODS
-    # ======================================================
-
+    
     def create_log(
         self,
         trip_id: UUID,
@@ -93,13 +68,6 @@ class ToolLogService(BaseService):
         status: str,
         execution_time_ms: int,
     ) -> ToolLogResponse:
-        """
-        Membuat tool execution log.
-
-        Data biasanya berasal dari
-        Tool Manager / AI Agent.
-        """
-
         log = ToolLog(
             trip_id=trip_id,
             tool_name=tool_name,
@@ -136,10 +104,6 @@ class ToolLogService(BaseService):
         self,
         log_id: UUID,
     ) -> ToolLogResponse:
-        """
-        Mengambil satu tool log.
-        """
-
         log = self._get_log(
             log_id,
         )
@@ -152,11 +116,6 @@ class ToolLogService(BaseService):
         self,
         trip_id: UUID,
     ) -> list[ToolLogResponse]:
-        """
-        Mengambil seluruh log
-        berdasarkan trip.
-        """
-
         logs = (
             self.tool_log_repository.get_by_trip(
                 self.db,
@@ -175,11 +134,6 @@ class ToolLogService(BaseService):
         self,
         tool_name: str,
     ) -> list[ToolLogResponse]:
-        """
-        Mengambil history eksekusi
-        berdasarkan nama tool.
-        """
-
         logs = (
             self.tool_log_repository.get_by_tool(
                 self.db,
@@ -197,11 +151,6 @@ class ToolLogService(BaseService):
     def get_success_logs(
         self,
     ) -> list[ToolLogResponse]:
-        """
-        Mengambil seluruh tool execution
-        yang berhasil.
-        """
-
         logs = (
             self.tool_log_repository.get_success_logs(
                 self.db,
@@ -218,11 +167,6 @@ class ToolLogService(BaseService):
     def get_failed_logs(
         self,
     ) -> list[ToolLogResponse]:
-        """
-        Mengambil seluruh tool execution
-        yang gagal.
-        """
-
         logs = (
             self.tool_log_repository.get_failed_logs(
                 self.db,

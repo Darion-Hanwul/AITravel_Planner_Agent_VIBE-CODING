@@ -21,32 +21,6 @@ from app.services.calendar_service import (
 
 
 class CalendarTool(BaseTool):
-    """
-    Calendar Tool.
-
-    Responsibility
-    --------------
-
-    AI Adapter untuk CalendarService.
-
-    Tool ini bertanggung jawab terhadap:
-
-    - Mapping kwargs menjadi Pydantic Schema.
-    - Validasi action.
-    - Membuka dan menutup database session.
-    - Logging proses eksekusi.
-    - Menjadi interface antara AI Agent
-      dengan CalendarService.
-
-    Tool ini TIDAK bertanggung jawab terhadap:
-
-    - Business Logic Calendar
-    - Database Query
-    - Repository
-    - Prompt Engineering
-    - Memory
-    - LangGraph Workflow
-    """
 
     NAME = "calendar"
 
@@ -85,10 +59,6 @@ class CalendarTool(BaseTool):
             enabled=enabled,
         )
 
-    # =====================================================
-    # METADATA
-    # =====================================================
-
     @property
     def name(
         self,
@@ -103,26 +73,10 @@ class CalendarTool(BaseTool):
 
         return self.DESCRIPTION
 
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
-
     def _create_service(
         self,
     ) -> tuple[ Session, CalendarService ]:
-        """
-        Membuat database session beserta
-        CalendarService.
-
-        Returns
-        -------
-        tuple
-            (
-                Session,
-                CalendarService,
-            )
-        """
-
+ 
         db: Session = SessionLocal()
 
         service = CalendarService(
@@ -139,23 +93,6 @@ class CalendarTool(BaseTool):
         value: Any,
         field_name: str,
     ) -> UUID:
-        """
-        Memastikan value merupakan UUID
-        yang valid.
-
-        Args
-        ----
-        value:
-            Nilai yang akan dikonversi.
-
-        field_name:
-            Nama field untuk pesan error.
-
-        Returns
-        -------
-        UUID
-        """
-
         try:
 
             if isinstance(
@@ -180,16 +117,6 @@ class CalendarTool(BaseTool):
         value: Any,
         field_name: str,
     ) -> date:
-        """
-        Memastikan value merupakan
-        object date.
-
-        Mendukung:
-
-        - datetime.date
-        - ISO date string
-        """
-
         if isinstance(
             value,
             date,
@@ -213,16 +140,6 @@ class CalendarTool(BaseTool):
         self,
         kwargs: dict[str, Any],
     ) -> CalendarEventCreate:
-        """
-        Membuat CalendarEventCreate
-        dari kwargs.
-
-        Tool bertanggung jawab melakukan
-        mapping parameter, sedangkan
-        validasi business dilakukan oleh
-        CalendarService.
-        """
-
         return CalendarEventCreate(
             activity_id=self._require_uuid(
                 kwargs["activity_id"],
@@ -251,13 +168,6 @@ class CalendarTool(BaseTool):
         self,
         kwargs: dict[str, Any],
     ) -> CalendarEventUpdate:
-        """
-        Membuat CalendarEventUpdate
-        dari kwargs.
-
-        Hanya field yang dikirim Agent
-        yang akan diperbarui.
-        """
 
         payload: dict[str, Any] = {}
 
@@ -293,23 +203,11 @@ class CalendarTool(BaseTool):
             **payload,
         )
 
-    # =====================================================
-    # ACTION METHODS
-    # =====================================================
-
     def create_event(
         self,
         service: CalendarService,
         **kwargs: Any,
     ) -> CalendarEventResponse:
-        """
-        Membuat calendar event baru.
-
-        Returns
-        -------
-        CalendarEventResponse
-        """
-
         logger.info(
             "Creating calendar event."
         )
@@ -327,14 +225,7 @@ class CalendarTool(BaseTool):
         service: CalendarService,
         **kwargs: Any,
     ) -> CalendarEventResponse:
-        """
-        Mengambil satu calendar event.
-
-        Returns
-        -------
-        CalendarEventResponse
-        """
-
+        
         event_id = self._require_uuid(
             kwargs["event_id"],
             "event_id",
@@ -353,14 +244,7 @@ class CalendarTool(BaseTool):
         service: CalendarService,
         **kwargs: Any,
     ) -> CalendarEventResponse:
-        """
-        Memperbarui calendar event.
-
-        Returns
-        -------
-        CalendarEventResponse
-        """
-
+        
         event_id = self._require_uuid(
             kwargs["event_id"],
             "event_id",
@@ -384,13 +268,6 @@ class CalendarTool(BaseTool):
         service: CalendarService,
         **kwargs: Any,
     ) -> dict[str, str]:
-        """
-        Menghapus calendar event.
-
-        Returns
-        -------
-        dict
-        """
 
         event_id = self._require_uuid(
             kwargs["event_id"],
@@ -411,23 +288,11 @@ class CalendarTool(BaseTool):
             )
         }
 
-    # =====================================================
-    # DATE QUERY METHODS
-    # =====================================================
-
     def get_events_by_date(
         self,
         service: CalendarService,
         **kwargs: Any,
     ) -> list[CalendarEventResponse]:
-        """
-        Mengambil seluruh calendar event
-        pada tanggal tertentu.
-
-        Returns
-        -------
-        list[CalendarEventResponse]
-        """
 
         event_date = self._require_date(
             kwargs["event_date"],
@@ -447,14 +312,6 @@ class CalendarTool(BaseTool):
         service: CalendarService,
         **kwargs: Any,
     ) -> list[CalendarEventResponse]:
-        """
-        Mengambil seluruh calendar event
-        dalam rentang tanggal.
-
-        Returns
-        -------
-        list[CalendarEventResponse]
-        """
 
         start_date = self._require_date(
             kwargs["start_date"],
@@ -480,14 +337,6 @@ class CalendarTool(BaseTool):
         self,
         service: CalendarService,
     ) -> list[CalendarEventResponse]:
-        """
-        Mengambil seluruh calendar event
-        yang memiliki reminder aktif.
-
-        Returns
-        -------
-        list[CalendarEventResponse]
-        """
 
         logger.info(
             "Getting reminder calendar events."
@@ -495,30 +344,10 @@ class CalendarTool(BaseTool):
 
         return service.get_reminder_events()
 
-    # =====================================================
-    # EXECUTION
-    # =====================================================
-
     def run(
         self,
         **kwargs: Any,
     ) -> Any:
-        """
-        Entry point CalendarTool.
-
-        Supported actions:
-
-        - create_event
-        - get_event
-        - update_event
-        - delete_event
-        - get_events_by_date
-        - get_events_between
-        - get_reminder_events
-
-        Seluruh business logic berada pada
-        CalendarService.
-        """
 
         action = (
             kwargs.get(

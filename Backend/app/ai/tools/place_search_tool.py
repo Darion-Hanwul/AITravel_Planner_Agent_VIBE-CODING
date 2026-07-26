@@ -17,28 +17,6 @@ from app.schemas.saved_place import (
 
 
 class PlaceSearchTool(BaseTool):
-    """
-    Place Search Tool.
-
-    Responsibility
-    --------------
-
-    - Search place menggunakan OpenStreetMap Nominatim.
-    - Forward geocoding (place -> coordinate).
-    - Reverse geocoding (coordinate -> address).
-    - Validasi input.
-    - Parsing response Nominatim.
-    - Logging.
-
-    Tidak bertanggung jawab terhadap:
-
-    - Database
-    - Saved Place
-    - LangGraph
-    - Prompt
-    - Memory
-    - RAG
-    """
 
     NAME = "place_search"
 
@@ -94,10 +72,6 @@ class PlaceSearchTool(BaseTool):
             },
         )
 
-    # =====================================================
-    # METADATA
-    # =====================================================
-
     @property
     def name(
         self,
@@ -112,24 +86,10 @@ class PlaceSearchTool(BaseTool):
 
         return self.DESCRIPTION
 
-    # =====================================================
-    # VALIDATION
-    # =====================================================
-
     def _validate_query(
         self,
         query: str,
     ) -> str:
-        """
-        Validasi query pencarian.
-
-        Returns:
-            Query yang telah dibersihkan.
-
-        Raises:
-            ValueError:
-                Jika query kosong.
-        """
 
         query = query.strip()
 
@@ -146,13 +106,6 @@ class PlaceSearchTool(BaseTool):
         latitude: Decimal,
         longitude: Decimal,
     ) -> tuple[Decimal, Decimal]:
-        """
-        Validasi koordinat.
-
-        Raises:
-            ValueError apabila latitude atau
-            longitude tidak valid.
-        """
 
         if not (
             Decimal("-90")
@@ -178,11 +131,6 @@ class PlaceSearchTool(BaseTool):
             latitude,
             longitude,
         )
-    
-    
-    # =====================================================
-    # HTTP REQUEST
-    # =====================================================
 
     def _request(
         self,
@@ -190,23 +138,6 @@ class PlaceSearchTool(BaseTool):
         *,
         params: dict[str, Any],
     ) -> Any:
-        """
-        Mengirim request ke Nominatim API.
-
-        Args:
-            endpoint:
-                Endpoint API.
-
-            params:
-                Query parameters.
-
-        Returns:
-            JSON response.
-
-        Raises:
-            RuntimeError:
-                Jika request gagal.
-        """
 
         url = (
             f"{self.base_url}/{endpoint}"
@@ -240,18 +171,10 @@ class PlaceSearchTool(BaseTool):
                 "with Nominatim."
             ) from exc
 
-    # =====================================================
-    # PARSER
-    # =====================================================
-
     @staticmethod
     def _to_decimal(
         value: str | float,
     ) -> Decimal:
-        """
-        Mengubah nilai koordinat
-        menjadi Decimal.
-        """
 
         return Decimal(
             str(value)
@@ -261,9 +184,6 @@ class PlaceSearchTool(BaseTool):
         self,
         item: dict[str, Any],
     ) -> PlaceSearchResult:
-        """
-        Parse hasil Search Place.
-        """
 
         address = item.get(
             "address",
@@ -329,9 +249,6 @@ class PlaceSearchTool(BaseTool):
         self,
         item: dict[str, Any],
     ) -> ReverseGeocodeResult:
-        """
-        Parse hasil Reverse Geocoding.
-        """
 
         address = item.get(
             "address",
@@ -362,21 +279,11 @@ class PlaceSearchTool(BaseTool):
             ),
         )
 
-    # =====================================================
-    # RESPONSE VALIDATION
-    # =====================================================
-
     @staticmethod
     def _ensure_result(
         data: Any,
         message: str,
     ) -> None:
-        """
-        Memastikan response tidak kosong.
-
-        Raises:
-            RuntimeError apabila data kosong.
-        """
 
         if not data:
 
@@ -384,33 +291,12 @@ class PlaceSearchTool(BaseTool):
                 message,
             )
     
-    # =====================================================
-    # PLACE SEARCH
-    # =====================================================
-        
     def search_place(
         self,
         query: str,
         *,
         limit: int = 5,
     ) -> list[PlaceSearchResult]:
-        """
-        Mencari tempat berdasarkan nama.
-
-        Args:
-            query:
-                Nama tempat yang dicari.
-
-            limit:
-                Maksimal jumlah hasil pencarian.
-
-        Returns:
-            List hasil pencarian.
-
-        Raises:
-            ValueError:
-                Jika limit tidak valid.
-        """
 
         query = self._validate_query(
             query,
@@ -459,18 +345,10 @@ class PlaceSearchTool(BaseTool):
 
         return results
     
-    # =====================================================
-    # FORWARD GEOCODING
-    # =====================================================
-
     def forward_geocode(
         self,
         query: str,
     ) -> ForwardGeocodeResult:
-        """
-        Mengubah nama lokasi menjadi
-        koordinat.
-        """
 
         query = self._validate_query(
             query,
@@ -508,19 +386,11 @@ class PlaceSearchTool(BaseTool):
 
         return result
 
-    # =====================================================
-    # REVERSE GEOCODING
-    # =====================================================
-
     def reverse_geocode(
         self,
         latitude: Decimal,
         longitude: Decimal,
     ) -> ReverseGeocodeResult:
-        """
-        Mengubah koordinat menjadi
-        alamat.
-        """
 
         (
             latitude,
@@ -561,10 +431,6 @@ class PlaceSearchTool(BaseTool):
         )
 
         return result
-    
-    # =====================================================
-    # EXECUTION
-    # =====================================================
 
     def run(
         self,
@@ -574,26 +440,6 @@ class PlaceSearchTool(BaseTool):
         | ForwardGeocodeResult
         | ReverseGeocodeResult
     ):
-        """
-        Entry point PlaceSearchTool.
-
-        Supported actions:
-
-        - search
-        - forward_geocode
-        - reverse_geocode
-
-        Args:
-            action:
-                Nama aksi yang akan dijalankan.
-
-        Returns:
-            Hasil sesuai action.
-
-        Raises:
-            ValueError:
-                Jika action tidak didukung.
-        """
 
         action = (
             kwargs.get(
@@ -659,16 +505,9 @@ class PlaceSearchTool(BaseTool):
                 "PlaceSearchTool finished."
             )
 
-    # =====================================================
-    # CLEANUP
-    # =====================================================
-
     def __del__(
         self,
     ) -> None:
-        """
-        Menutup HTTP client.
-        """
 
         try:
 

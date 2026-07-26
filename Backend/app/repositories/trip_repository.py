@@ -18,10 +18,6 @@ class TripRepository(BaseRepository[Trip]):
     def __init__(self) -> None:
         super().__init__(Trip)
 
-    # =====================================================
-    # GET TRIPS BY USER
-    # =====================================================
-
     def get_by_user(
         self,
         db: Session,
@@ -35,10 +31,6 @@ class TripRepository(BaseRepository[Trip]):
         )
 
         return list(db.scalars(stmt))
-
-    # =====================================================
-    # GET COMPLETE TRIP
-    # =====================================================
 
     def get_trip_detail(
         self,
@@ -58,10 +50,6 @@ class TripRepository(BaseRepository[Trip]):
 
         return db.scalar(stmt)
 
-    # =====================================================
-    # UPDATE STATUS
-    # =====================================================
-
     def update_status(
         self,
         db: Session,
@@ -75,10 +63,6 @@ class TripRepository(BaseRepository[Trip]):
             db,
             trip,
         )
-
-    # =====================================================
-    # UPDATE TOTAL COST
-    # =====================================================
 
     def update_total_cost(
         self,
@@ -94,15 +78,10 @@ class TripRepository(BaseRepository[Trip]):
             trip,
         )
 
-
 class TripDayRepository(BaseRepository[TripDay]):
 
     def __init__(self) -> None:
         super().__init__(TripDay)
-
-    # =====================================================
-    # GET BY TRIP
-    # =====================================================
 
     def get_by_trip(
         self,
@@ -120,15 +99,10 @@ class TripDayRepository(BaseRepository[TripDay]):
             db.scalars(stmt)
         )
 
-
 class ActivityRepository(BaseRepository[Activity]):
 
     def __init__(self) -> None:
         super().__init__(Activity)
-
-    # =====================================================
-    # GET BY TRIP DAY
-    # =====================================================
 
     def get_by_trip_day(
         self,

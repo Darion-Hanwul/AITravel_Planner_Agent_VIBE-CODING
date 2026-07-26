@@ -14,10 +14,6 @@ class ToolLogRepository(
     def __init__(self) -> None:
         super().__init__(ToolLog)
 
-    # =====================================================
-    # GET LOGS BY TRIP
-    # =====================================================
-
     def get_by_trip(
         self,
         db: Session,
@@ -38,10 +34,6 @@ class ToolLogRepository(
             db.scalars(stmt)
         )
 
-    # =====================================================
-    # GET LOGS BY TOOL
-    # =====================================================
-
     def get_by_tool(
         self,
         db: Session,
@@ -61,10 +53,6 @@ class ToolLogRepository(
         return list(
             db.scalars(stmt)
         )
-
-    # =====================================================
-    # GET SUCCESS LOGS
-    # =====================================================
 
     def get_success_logs(
         self,

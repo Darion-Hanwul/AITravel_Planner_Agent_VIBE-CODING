@@ -4,21 +4,11 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Weather Request
-# ==========================================================
-
 class WeatherRequest(BaseModel):
 
     city: str = Field(..., min_length=2)
 
     country: str = Field(..., min_length=2)
-
-
-# ==========================================================
-# Weather Response
-# ==========================================================
 
 class WeatherResponse(BaseModel):
 

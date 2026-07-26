@@ -22,16 +22,6 @@ from app.services.base_service import BaseService
 
 
 class HistoryService(BaseService):
-    """
-    Business logic untuk Conversation History.
-
-    Bertanggung jawab terhadap:
-
-    - Conversation History
-    - Conversation Context
-    - Memory Builder
-    - Chat Context Builder
-    """
 
     def __init__(
         self,
@@ -48,18 +38,10 @@ class HistoryService(BaseService):
             ChatMessageRepository()
         )
 
-    # ======================================================
-    # PRIVATE HELPERS
-    # ======================================================
-
     def _get_session(
         self,
         session_id: UUID,
     ) -> ChatSession:
-        """
-        Mengambil chat session berdasarkan id.
-        """
-
         session = (
             self.chat_session_repository.get_by_id(
                 self.db,
@@ -78,10 +60,6 @@ class HistoryService(BaseService):
         self,
         session_id: UUID,
     ) -> list[ChatMessage]:
-        """
-        Mengambil seluruh chat message
-        berdasarkan session.
-        """
 
         self._get_session(session_id)
 
@@ -97,11 +75,6 @@ class HistoryService(BaseService):
         messages: list[ChatMessage],
         limit: int,
     ) -> list[ChatMessage]:
-        """
-        Membatasi jumlah history
-        yang digunakan sebagai context.
-        """
-
         if limit <= 0:
             return messages
 
@@ -111,24 +84,6 @@ class HistoryService(BaseService):
         self,
         messages: list[ChatMessage],
     ) -> list[dict[str, str]]:
-        """
-        Mengubah history menjadi format
-        yang dapat digunakan oleh LLM.
-
-        Example:
-
-        [
-            {
-                "role": "user",
-                "content": "Hello"
-            },
-            {
-                "role": "assistant",
-                "content": "Hi!"
-            }
-        ]
-        """
-
         return [
             {
                 "role": message.role,
@@ -141,26 +96,14 @@ class HistoryService(BaseService):
         self,
         message: ChatMessage,
     ) -> ChatMessageResponse:
-        """
-        Mapping ORM ke response schema.
-        """
-
         return ChatMessageResponse.model_validate(
             message,
         )
-
-    # ======================================================
-    # PUBLIC METHODS
-    # ======================================================
 
     def get_history(
         self,
         session_id: UUID,
     ) -> list[ChatMessageResponse]:
-        """
-        Mengambil seluruh history chat.
-        """
-
         messages = self._get_messages(
             session_id,
         )
@@ -177,10 +120,6 @@ class HistoryService(BaseService):
         session_id: UUID,
         limit: int = 10,
     ) -> list[ChatMessageResponse]:
-        """
-        Mengambil beberapa history
-        percakapan terakhir.
-        """
 
         messages = self._get_messages(
             session_id,
@@ -203,12 +142,6 @@ class HistoryService(BaseService):
         session_id: UUID,
         limit: int = 10,
     ) -> list[dict[str, str]]:
-        """
-        Membangun conversation context
-        yang akan digunakan oleh
-        PromptBuilder maupun AI Agent.
-        """
-
         messages = self._get_messages(
             session_id,
         )
@@ -226,11 +159,6 @@ class HistoryService(BaseService):
         self,
         session_id: UUID,
     ) -> int:
-        """
-        Menghitung jumlah message
-        dalam sebuah session.
-        """
-
         messages = self._get_messages(
             session_id,
         )
@@ -241,11 +169,6 @@ class HistoryService(BaseService):
         self,
         session_id: UUID,
     ) -> None:
-        """
-        Menghapus seluruh history
-        dalam sebuah chat session.
-        """
-
         self._get_session(
             session_id,
         )

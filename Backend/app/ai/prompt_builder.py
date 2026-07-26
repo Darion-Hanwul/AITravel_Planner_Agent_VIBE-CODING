@@ -6,25 +6,6 @@ from app.ai.models.retrieved_document import RetrievedDocument
 
 
 class PromptBuilder:
-    """
-    Builder untuk menyusun prompt yang akan
-    dikirim ke LLM.
-
-    Responsibility
-    --------------
-
-    - Load prompt template
-    - Menyusun context
-    - Menyusun history
-    - Menyusun final prompt
-
-    Tidak bertanggung jawab terhadap
-
-    - LLM
-    - Embedding
-    - Retrieval
-    - RAG
-    """
 
     PROMPT_DIR = (
         Path(__file__)
@@ -33,18 +14,11 @@ class PromptBuilder:
         / "prompts"
     )
 
-    # =====================================================
-    # PRIVATE
-    # =====================================================
-
     def _load_prompt(
         self,
         filename: str,
     ) -> str:
-        """
-        Membaca isi file prompt.
-        """
-
+ 
         path = self.PROMPT_DIR / filename
 
         if not path.exists():
@@ -60,9 +34,6 @@ class PromptBuilder:
         self,
         documents: list[RetrievedDocument],
     ) -> str:
-        """
-        Mengubah retrieved document menjadi context.
-        """
 
         if not documents:
             return ""
@@ -88,10 +59,6 @@ class PromptBuilder:
         self,
         history: list[str] | None,
     ) -> str:
-        """
-        Mengubah conversation history
-        menjadi string.
-        """
 
         if not history:
             return ""
@@ -99,10 +66,6 @@ class PromptBuilder:
         return "\n".join(
             history,
         )
-
-    # =====================================================
-    # PUBLIC
-    # =====================================================
 
     def build(
         self,
@@ -112,9 +75,6 @@ class PromptBuilder:
         documents: list[RetrievedDocument] | None = None,
         history: list[str] | None = None,
     ) -> str:
-        """
-        Menyusun prompt lengkap.
-        """
 
         context = self._build_context(
             documents or [],
@@ -159,10 +119,6 @@ class PromptBuilder:
         return "\n".join(
             prompt_parts,
         )
-
-    # =====================================================
-    # PROMPT LOADER
-    # =====================================================
 
     def system_prompt(self) -> str:
         return self._load_prompt(

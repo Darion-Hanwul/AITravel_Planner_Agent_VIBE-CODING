@@ -9,20 +9,6 @@ from app.ai.models.retrieved_document import RetrievedDocument
 
 
 class BudgetAgent(BaseAgent):
-    """
-    BudgetAgent bertanggung jawab melakukan estimasi biaya, optimasi anggaran,
-    dan konversi mata uang (Prinsip 1).
-
-    Responsibility
-    --------------
-    - Mengestimasi biaya harian, penginapan, transportasi, dan rekreasi.
-    - Menyediakan rekomendasi penghematan berdasarkan tipe anggaran (backpacker/luxury).
-
-    Tidak bertanggung jawab terhadap:
-    - Rekomendasi rute logistik perjalanan (tugas Research/Schedule Agent).
-    - Analisis keamanan wilayah (tugas SafetyAgent).
-    """
-
     def __init__(
         self,
         *,
@@ -55,8 +41,6 @@ class BudgetAgent(BaseAgent):
         documents: list[RetrievedDocument] | None = None,
     ) -> str:
         """
-        Menyusun kalkulasi rancangan pengeluaran perjalanan (Prinsip 19).
-
         Args:
             destination: Nama lokasi tujuan.
             budget_tier: Kategori budget (e.g., 'backpacker', 'moderate', 'luxury').

@@ -4,11 +4,6 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 
-
-# ==========================================================
-# Base
-# ==========================================================
-
 class SavedPlaceBase(BaseModel):
 
     name: str = Field(..., min_length=2, max_length=200)
@@ -25,18 +20,8 @@ class SavedPlaceBase(BaseModel):
 
     notes: str | None = None
 
-
-# ==========================================================
-# Create
-# ==========================================================
-
 class SavedPlaceCreate(SavedPlaceBase):
     pass
-
-
-# ==========================================================
-# Update
-# ==========================================================
 
 class SavedPlaceUpdate(BaseModel):
 
@@ -54,11 +39,6 @@ class SavedPlaceUpdate(BaseModel):
 
     notes: str | None = None
 
-
-# ==========================================================
-# Response
-# ==========================================================
-
 class SavedPlaceResponse(SavedPlaceBase):
 
     id: UUID
@@ -68,11 +48,6 @@ class SavedPlaceResponse(SavedPlaceBase):
     model_config = ConfigDict(
         from_attributes=True
     )
-
-# ==========================================================
-# AI PLACE SEARCH RESULT
-# ==========================================================
-
 
 class PlaceSearchResult(BaseModel):
     """
@@ -96,12 +71,6 @@ class PlaceSearchResult(BaseModel):
 
     place_type: str | None = None
 
-
-# ==========================================================
-# AI FORWARD GEOCODING
-# ==========================================================
-
-
 class ForwardGeocodeResult(BaseModel):
     """
     Hasil geocoding dari nama lokasi
@@ -115,12 +84,6 @@ class ForwardGeocodeResult(BaseModel):
     longitude: Decimal
 
     display_name: str
-
-
-# ==========================================================
-# AI REVERSE GEOCODING
-# ==========================================================
-
 
 class ReverseGeocodeResult(BaseModel):
     """

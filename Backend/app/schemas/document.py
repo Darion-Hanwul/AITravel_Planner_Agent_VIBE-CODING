@@ -3,11 +3,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Base
-# ==========================================================
-
 class DocumentBase(BaseModel):
 
     title: str = Field(..., min_length=2, max_length=255)
@@ -16,19 +11,9 @@ class DocumentBase(BaseModel):
 
     source: str = Field(..., min_length=2)
 
-
-# ==========================================================
-# Upload
-# ==========================================================
-
 class DocumentUpload(BaseModel):
 
     title: str = Field(..., min_length=2, max_length=255)
-
-
-# ==========================================================
-# Response
-# ==========================================================
 
 class DocumentResponse(DocumentBase):
 

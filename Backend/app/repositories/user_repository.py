@@ -14,10 +14,6 @@ class UserRepository(BaseRepository[User]):
     def __init__(self) -> None:
         super().__init__(User)
 
-    # =====================================================
-    # GET USER BY EMAIL
-    # =====================================================
-
     def get_by_email(
         self,
         db: Session,
@@ -30,10 +26,6 @@ class UserRepository(BaseRepository[User]):
         )
 
         return db.scalar(stmt)
-
-    # =====================================================
-    # CHECK EMAIL EXISTS
-    # =====================================================
 
     def exists_by_email(
         self,
@@ -48,10 +40,6 @@ class UserRepository(BaseRepository[User]):
         )
 
         return db.scalar(stmt) is not None
-
-    # =====================================================
-    # SEARCH USER
-    # =====================================================
 
     def get_by_full_name(
         self,
@@ -72,10 +60,6 @@ class UserRepository(BaseRepository[User]):
             db.scalars(stmt)
         )
 
-    # =====================================================
-    # UPDATE AVATAR
-    # =====================================================
-
     def update_avatar(
         self,
         db: Session,
@@ -90,17 +74,12 @@ class UserRepository(BaseRepository[User]):
             user,
         )
 
-
 class UserPreferenceRepository(
     BaseRepository[UserPreference]
 ):
 
     def __init__(self) -> None:
         super().__init__(UserPreference)
-
-    # =====================================================
-    # GET USER PREFERENCE
-    # =====================================================
 
     def get_by_user_id(
         self,
@@ -116,10 +95,6 @@ class UserPreferenceRepository(
         )
 
         return db.scalar(stmt)
-
-    # =====================================================
-    # UPDATE PREFERENCE
-    # =====================================================
 
     def update_preference(
         self,

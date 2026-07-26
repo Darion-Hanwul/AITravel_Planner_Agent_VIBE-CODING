@@ -1,20 +1,3 @@
-"""
-Authentication Middleware.
-
-Middleware ini bertanggung jawab untuk:
-
-- Mengekstrak Bearer Token dari Authorization Header.
-- Menyimpan access token ke request.state.
-- Melewatkan endpoint publik tanpa autentikasi.
-
-Middleware ini TIDAK:
-- Memvalidasi JWT.
-- Mengakses database.
-- Mengambil data user.
-
-Validasi token dilakukan oleh AuthService melalui Dependency.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -24,11 +7,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
 from app.core.exceptions import UnauthorizedError
-
-
-# ==========================================================
-# PUBLIC ENDPOINTS
-# ==========================================================
 
 PUBLIC_PATHS = {
     "/",
@@ -41,17 +19,7 @@ PUBLIC_PATHS = {
     "/auth/refresh",
 }
 
-
-# ==========================================================
-# AUTH MIDDLEWARE
-# ==========================================================
-
-
 class AuthenticationMiddleware(BaseHTTPMiddleware):
-    """
-    Middleware untuk mengambil Bearer Token
-    dan menyimpannya ke request.state.
-    """
 
     async def dispatch(
         self,

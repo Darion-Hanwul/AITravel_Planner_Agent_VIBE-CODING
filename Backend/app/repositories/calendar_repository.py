@@ -15,10 +15,6 @@ class CalendarRepository(
     def __init__(self) -> None:
         super().__init__(CalendarEvent)
 
-    # =====================================================
-    # GET BY ACTIVITY
-    # =====================================================
-
     def get_by_activity(
         self,
         db: Session,
@@ -33,10 +29,6 @@ class CalendarRepository(
         )
 
         return db.scalar(stmt)
-
-    # =====================================================
-    # GET BY DATE
-    # =====================================================
 
     def get_by_date(
         self,
@@ -57,10 +49,6 @@ class CalendarRepository(
         return list(
             db.scalars(stmt)
         )
-
-    # =====================================================
-    # GET BETWEEN DATES
-    # =====================================================
 
     def get_between_dates(
         self,
@@ -85,10 +73,6 @@ class CalendarRepository(
             db.scalars(stmt)
         )
 
-    # =====================================================
-    # GET REMINDER EVENTS
-    # =====================================================
-
     def get_reminder_events(
         self,
         db: Session,
@@ -108,10 +92,6 @@ class CalendarRepository(
         return list(
             db.scalars(stmt)
         )
-
-    # =====================================================
-    # DELETE BY ACTIVITY
-    # =====================================================
 
     def delete_by_activity(
         self,

@@ -3,21 +3,11 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Tool Execute Request
-# ==========================================================
-
 class ToolExecutionRequest(BaseModel):
 
     tool_name: str = Field(..., min_length=2)
 
     input_data: dict
-
-
-# ==========================================================
-# Tool Execute Response
-# ==========================================================
 
 class ToolExecutionResponse(BaseModel):
 
@@ -26,11 +16,6 @@ class ToolExecutionResponse(BaseModel):
     success: bool
 
     output_data: dict
-
-
-# ==========================================================
-# Tool Log Response
-# ==========================================================
 
 class ToolLogResponse(BaseModel):
 

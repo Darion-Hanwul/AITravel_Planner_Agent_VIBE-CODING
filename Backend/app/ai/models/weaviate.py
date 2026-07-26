@@ -25,27 +25,9 @@ from app.ai.models.retrieved_document import (
 from weaviate.classes.query import MetadataQuery
 
 class WeaviateModel:
-    """
-    Wrapper untuk koneksi dan operasi Weaviate.
-
-    Bertanggung jawab terhadap:
-
-    - Connection (Embedded Mode)
-    - Collection Management
-    - Insert Object
-    - Vector Search
-    - Hybrid Search
-
-    Tidak bertanggung jawab terhadap:
-
-    - Embedding
-    - Chunking
-    - RAG
-    - AI Agent
-    """
 
     def __init__(self) -> None:
-        # Menambahkan type hint Optional agar linter tahu client bisa bernilai None
+
         self.client: Optional[weaviate.WeaviateClient] = None
         try:
             self.client = weaviate.connect_to_embedded(
@@ -58,10 +40,6 @@ class WeaviateModel:
         except Exception as e:
             print(f"[Weaviate Critical Error] Gagal menginisialisasi mode Embedded: {e}")
             self.client = None
-
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
 
     def _get_collection(
         self,
@@ -85,24 +63,13 @@ class WeaviateModel:
         return collection
 
     def close(self) -> None:
-        """
-        Menutup koneksi Weaviate.
-        """
         if self.client:
             self.client.close()
-
-
-    # =====================================================
-    # COLLECTION
-    # =====================================================
 
     def collection_exists(
         self,
         collection_name: str,
     ) -> bool:
-        """
-        Mengecek apakah collection sudah ada.
-        """
         if not self.client:
             return False
 
@@ -114,9 +81,6 @@ class WeaviateModel:
         self,
         collection_name: str,
     ) -> None:
-        """
-        Membuat collection apabila belum ada.
-        """
         if not self.client:
             raise RuntimeError("Weaviate client is not initialized.")
 
@@ -132,9 +96,7 @@ class WeaviateModel:
         self,
         collection_name: str,
     ) -> None:
-        """
-        Menghapus collection.
-        """
+        
         if not self.client:
             raise RuntimeError("Weaviate client is not initialized.")
 
@@ -145,18 +107,11 @@ class WeaviateModel:
             collection_name,
         )
 
-    # =====================================================
-    # INSERT
-    # =====================================================
-
     def insert_documents(
         self,
         collection_name: str,
         documents: list[EmbeddedDocument],
     ) -> None:
-        """
-        Menyimpan seluruh embedding ke Weaviate.
-        """
         if not self.client:
             raise RuntimeError("Weaviate client is not initialized.")
 
@@ -175,10 +130,6 @@ class WeaviateModel:
                     },
                     vector=item.embedding,
                 )
-
-    # =====================================================
-    # SEARCH
-    # =====================================================
 
     def vector_search(
         self,

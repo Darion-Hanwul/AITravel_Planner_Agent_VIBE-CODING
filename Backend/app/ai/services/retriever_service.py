@@ -7,25 +7,6 @@ from app.config.settings import settings
 
 
 class RetrieverService:
-    """
-    Service untuk melakukan document retrieval
-    dari Weaviate.
-
-    Responsibility
-    --------------
-
-    - Query Embedding
-    - Vector Search
-    - Hybrid Search
-
-    Tidak bertanggung jawab terhadap
-
-    - Crawling
-    - Chunking
-    - Embedding Indexing
-    - Prompt
-    - LLM
-    """
 
     def __init__(
         self,
@@ -41,35 +22,19 @@ class RetrieverService:
             settings.WEAVIATE_CLASS
         )
 
-    # =====================================================
-    # PRIVATE
-    # =====================================================
-
     def _embed_query(
         self,
         query: str,
     ) -> list[float]:
-        """
-        Mengubah query menjadi embedding vector.
-        """
-
         return self.embedding_model.embed_query(
             query,
         )
-
-    # =====================================================
-    # PUBLIC
-    # =====================================================
 
     def vector_search(
         self,
         query: str,
         limit: int | None = None,
     ) -> list[RetrievedDocument]:
-        """
-        Pure Vector Search.
-        """
-
         query_vector = self._embed_query(
             query,
         )
@@ -85,15 +50,6 @@ class RetrieverService:
         query: str,
         limit: int | None = None,
     ) -> list[RetrievedDocument]:
-        """
-        Hybrid Search.
-
-        Menggunakan:
-
-        - embedding
-        - keyword
-        """
-
         query_vector = self._embed_query(
             query,
         )
@@ -106,7 +62,5 @@ class RetrieverService:
         )
     
     def close(self) -> None:
-        """
-        Menutup resource retriever.
-        """
+
         self.weaviate.close()

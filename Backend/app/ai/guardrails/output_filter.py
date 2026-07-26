@@ -44,22 +44,19 @@ class OutputFilterGuard:
     def __init__(self) -> None:
         """Inisialisasi regex pattern untuk pembersihan output."""
         logger.info("Initializing OutputFilterGuard.")
-        
-        # 1. Pola Kebocoran Prompt Internal / System Prompt Triggers
+
         self.system_prompt_patterns = [
             re.compile(r"(you are a personal travel assistant|your task is to help|follow clean architecture)", re.IGNORECASE),
             re.compile(r"(system prompt|instruksi internal|core instructions|agent role:)", re.IGNORECASE),
             re.compile(r"(thought process|mata rantai pemikiran|reasoning path):?.*?\n", re.IGNORECASE)
         ]
 
-        # 2. Pola Kebocoran Data Sensitif (PII & Secrets)
         self.sensitive_data_patterns = {
             "API_KEY": re.compile(r"(aiza[0-9A-Za-z-_]{35}|sk-[a-zA-Z0-9]{48}|ghp_[a-zA-Z0-9]{36})"),
             "CREDIT_CARD": re.compile(r"\b(?:\d[ -]*?){13,16}\b"),
             "EMAIL": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
         }
 
-        # 3. Pola Kebocoran Data Mentah Tool / Agen internal
         self.tool_leakage_patterns = [
             re.compile(r"<\s*tool_call\s*>.*?<\s*/\s*tool_call\s*>", re.DOTALL | re.IGNORECASE),
             re.compile(r"\{\s*\"tool\"\s*:\s*\".*?\"\s*,\s*\"args\"\s*:\s*\{.*?\}\s*\}", re.DOTALL),
@@ -85,27 +82,23 @@ class OutputFilterGuard:
         current_text = raw_text
         modified_categories: list[str] = []
 
-        # Step 1: Bersihkan Kebocoran Prompt Sistem / Pemikiran Internal Agen
         for pattern in self.system_prompt_patterns:
             if pattern.search(current_text):
                 current_text = pattern.sub("", current_text)
                 if "SYSTEM_PROMPT" not in modified_categories:
                     modified_categories.append("SYSTEM_PROMPT")
 
-        # Step 2: Bersihkan Struktur Pemanggilan Tool Mentah (JSON / XML tags dari LLM)
         for pattern in self.tool_leakage_patterns:
             if pattern.search(current_text):
                 current_text = pattern.sub("", current_text)
                 if "TOOL_METADATA" not in modified_categories:
                     modified_categories.append("TOOL_METADATA")
 
-        # Step 3: Sensor Data Sensitif (PII / Kredensial rahasia)
         for category, pattern in self.sensitive_data_patterns.items():
             if pattern.search(current_text):
                 current_text = pattern.sub("[REDACTED]", current_text)
                 modified_categories.append(category)
 
-        # Post-processing: Bersihkan spasi berlebih atau baris kosong akibat pembersihan regex
         current_text = re.sub(r'\n\s*\n', '\n\n', current_text).strip()
 
         is_modified = len(modified_categories) > 0

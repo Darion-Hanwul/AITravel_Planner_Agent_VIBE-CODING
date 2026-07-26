@@ -11,9 +11,6 @@ logger = logging.getLogger("app.ai.graph.router")
 
 class QueryRouter:
     """
-    QueryRouter bertanggung jawab untuk mengklasifikasikan intent query pengguna 
-    secara deterministik sebelum masuk ke dalam workflow utama (Prinsip 1, 14, 24).
-
     Responsibility
     --------------
     - Menganalisis query pengguna menggunakan metode deterministik (Regex & Keywords).

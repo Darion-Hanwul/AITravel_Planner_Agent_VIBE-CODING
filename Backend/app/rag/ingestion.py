@@ -1,10 +1,3 @@
-"""
-RAG Ingestion Service
-
-Mengelola alur end-to-end masuknya dokumen baru: memuat file, memotong teks,
-membuat vector embedding via Ollama API, dan menyimpannya ke Weaviate v4.
-"""
-
 import httpx
 from pathlib import Path
 from typing import Dict, Any, List
@@ -22,9 +15,6 @@ class DataIngestionService:
         self.vector_store = WeaviateVectorStore()
 
     async def _get_ollama_embedding(self, text: str) -> List[float]:
-        """
-        Menembak API lokal Ollama untuk mendapatkan vektor embedding dari teks chunk.
-        """
         url = f"{settings.OLLAMA_BASE_URL}/api/embeddings"
         payload = {
             "model": settings.OLLAMA_EMBED_MODEL,
@@ -42,45 +32,31 @@ class DataIngestionService:
             return []
 
     async def ingest_document(self, file_path_str: str, document_id: Any) -> Dict[str, Any]:
-        """
-        Memproses dokumen dari file fisik hingga masuk ke dalam database Weaviate.
-        
-        Args:
-            file_path_str (str): Path lokasi file disimpan.
-            document_id (Any): ID unik dokumen untuk relasi database SQL.
-            
-        Returns:
-            Dict[str, Any]: Laporan status eksekusi ingestion.
-        """
+
         file_path = Path(file_path_str)
         if not file_path.exists():
             return {"status": "error", "message": f"File tidak ditemukan di path: {file_path_str}"}
 
         try:
-            # 1. Load teks mentah dokumen
             raw_text = self.loader.load_file(file_path_str)
             if not raw_text.strip():
                 return {"status": "error", "message": "Dokumen kosong atau tidak mengandung teks."}
 
-            # 2. Potong teks menjadi beberapa chunks
             chunks = self.splitter.split_text(raw_text)
-            
-            # Meta data untuk relasi pencarian nantinya
+
             meta_data = {
                 "document_id": str(document_id),
                 "source_name": file_path.name
             }
 
             successful_chunks = 0
-            
-            # 3. Looping untuk membuat embedding dan simpan ke Weaviate per chunk
+
             for chunk in chunks:
                 if not chunk.strip():
                     continue
                     
                 embedding = await self._get_ollama_embedding(chunk)
-                
-                # Jika embedding berhasil digenerate, masukkan ke Weaviate v4
+
                 if embedding:
                     success = self.vector_store.add_document_chunk(
                         content=chunk,

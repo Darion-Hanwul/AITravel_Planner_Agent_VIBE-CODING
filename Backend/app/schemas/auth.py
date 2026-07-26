@@ -1,12 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 
-
-# ==========================================================
-# REGISTER REQUEST
-# ==========================================================
-
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
-
 
 class RegisterRequest(BaseModel):
 
@@ -28,11 +22,6 @@ class RegisterRequest(BaseModel):
         extra="forbid",
     )
 
-
-# ==========================================================
-# LOGIN REQUEST
-# ==========================================================
-
 class LoginRequest(BaseModel):
 
     email: EmailStr
@@ -43,11 +32,6 @@ class LoginRequest(BaseModel):
         extra="forbid",
     )
 
-
-# ==========================================================
-# TOKEN RESPONSE
-# ==========================================================
-
 class TokenResponse(BaseModel):
 
     access_token: str
@@ -56,11 +40,6 @@ class TokenResponse(BaseModel):
 
     token_type: str = "bearer"
 
-
-# ==========================================================
-# REFRESH TOKEN REQUEST
-# ==========================================================
-
 class RefreshTokenRequest(BaseModel):
 
     refresh_token: str
@@ -68,10 +47,6 @@ class RefreshTokenRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-
-# ==========================================================
-# CHANGE PASSWORD
-# ==========================================================
 
 class ChangePasswordRequest(BaseModel):
 

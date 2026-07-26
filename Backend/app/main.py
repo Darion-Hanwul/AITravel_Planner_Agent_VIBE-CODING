@@ -26,9 +26,9 @@ def create_app() -> FastAPI:
     )
 
     origins = [
-        "http://localhost:3000",  # React / Next.js default
+        "http://localhost:3000",  
         "http://127.0.0.1:3000",
-        "*",                      # Ubah ke domain spesifik saat production demi keamanan
+        "*",                     
     ]
     
     app.add_middleware(LoggingMiddleware)
@@ -54,10 +54,6 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # ==========================================================
-    # ROUTER REGISTRATION
-    # ==========================================================
-    # Menyertakan semua endpoint yang sudah kita buat ke dalam aplikasi utama
     app.include_router(auth.router)
     app.include_router(user.router)
     app.include_router(trip.router)
@@ -68,9 +64,6 @@ def create_app() -> FastAPI:
     app.include_router(tool.router)
     app.include_router(rag.router)
 
-    # ==========================================================
-    # HEALTH CHECK ENDPOINT
-    # ==========================================================
     @app.get("/", tags=["Health Check"], summary="Mengecek status aplikasi")
     def root():
         return {

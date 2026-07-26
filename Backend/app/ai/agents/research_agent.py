@@ -9,19 +9,6 @@ from app.ai.models.retrieved_document import RetrievedDocument
 
 
 class ResearchAgent(BaseAgent):
-    """
-    ResearchAgent bertanggung jawab melakukan pencarian informasi mendalam
-    mengenai destinasi, akomodasi, atraksi, dan transportasi (Prinsip 1).
-
-    Responsibility
-    --------------
-    - Mengumpulkan data dasar destinasi wisata dari tools maupun dokumen.
-    - Menyusun analisis awal mengenai objek wisata yang relevan bagi user.
-
-    Tidak bertanggung jawab terhadap:
-    - Kalkulasi anggaran belanja (tugas BudgetAgent).
-    - Penyusunan kalender detail (tugas ScheduleAgent).
-    """
 
     def __init__(
         self,
@@ -53,8 +40,6 @@ class ResearchAgent(BaseAgent):
         documents: list[RetrievedDocument] | None = None,
     ) -> str:
         """
-        Melakukan riset terhadap destinasi tertentu dengan memanfaatkan tools yang tersedia (Prinsip 16).
-
         Args:
             destination: Nama kota atau negara tujuan riset.
             query: Detail pertanyaan spesifik dari user.

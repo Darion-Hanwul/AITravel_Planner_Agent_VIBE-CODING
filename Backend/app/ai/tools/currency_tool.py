@@ -20,27 +20,6 @@ from app.repositories.currency_repository import (
 
 
 class CurrencyTool(BaseTool):
-    """
-    Currency Tool.
-
-    Responsibility
-    --------------
-
-    - Mengambil nilai tukar mata uang dari
-      ExchangeRate API.
-    - Menyimpan exchange rate ke database.
-    - Menggunakan cache apabila masih valid.
-    - Menghitung hasil konversi mata uang.
-    - Logging seluruh proses.
-
-    Tidak bertanggung jawab terhadap:
-
-    - Prompt Engineering
-    - LangGraph
-    - Memory
-    - Tool Registry
-    - LLM
-    """
 
     NAME = "currency"
 
@@ -88,19 +67,11 @@ class CurrencyTool(BaseTool):
         )
 
     def __del__(self) -> None:
-        """
-        Menutup HTTP client ketika object
-        dihancurkan.
-        """
 
         try:
             self.http.close()
         except Exception:
             pass
-
-    # =====================================================
-    # METADATA
-    # =====================================================
 
     @property
     def name(
@@ -116,19 +87,10 @@ class CurrencyTool(BaseTool):
 
         return self.DESCRIPTION
 
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
-
     def _normalize_currency(
         self,
         currency: str,
     ) -> str:
-        """
-        Normalisasi dan validasi kode mata uang
-        berdasarkan standar ISO 4217.
-        """
-
         currency = currency.strip().upper()
 
         if len(currency) != 3 or not currency.isalpha():
@@ -144,10 +106,6 @@ class CurrencyTool(BaseTool):
         base_currency: str,
         target_currency: str,
     ) -> CurrencyHistory | None:
-        """
-        Mengambil exchange rate terbaru
-        dari database.
-        """
 
         return self.currency_repository.get_latest_rate(
             db=db,
@@ -160,25 +118,6 @@ class CurrencyTool(BaseTool):
         base_currency: str,
         target_currency: str,
     ) -> Decimal:
-        """
-        Mengambil exchange rate terbaru dari
-        ExchangeRate API.
-
-        Args:
-            base_currency:
-                Mata uang asal.
-
-            target_currency:
-                Mata uang tujuan.
-
-        Returns:
-            Exchange rate terbaru.
-
-        Raises:
-            RuntimeError:
-                Apabila request ke API gagal.
-        """
-
         logger.info(
             "Fetching exchange rate from "
             "ExchangeRate API "
@@ -259,13 +198,6 @@ class CurrencyTool(BaseTool):
         amount: Decimal,
         exchange_rate: Decimal,
     ) -> Decimal:
-        """
-        Menghitung hasil konversi mata uang.
-
-        Returns:
-            Nilai hasil konversi.
-        """
-
         return (
             amount * exchange_rate
         ).quantize(
@@ -279,15 +211,6 @@ class CurrencyTool(BaseTool):
         target_currency: str,
         exchange_rate: Decimal,
     ) -> CurrencyHistory:
-        """
-        Menyimpan exchange rate terbaru
-        ke database.
-
-        Returns:
-            CurrencyHistory yang telah
-            berhasil disimpan.
-        """
-
         cache = CurrencyHistory(
             base_currency=base_currency,
             target_currency=target_currency,
@@ -312,31 +235,10 @@ class CurrencyTool(BaseTool):
 
         return cache
     
-    # =====================================================
-    # PUBLIC METHODS
-    # =====================================================
-
     def run(
         self,
         **kwargs: Any,
     ) -> dict[str, object]:
-        """
-        Mengambil nilai tukar mata uang dan
-        melakukan konversi.
-
-        Workflow
-
-            1. Normalisasi currency code.
-            2. Validasi amount.
-            3. Cek cache database.
-            4. Jika cache masih valid,
-               gunakan cache.
-            5. Jika cache tidak valid,
-               ambil dari ExchangeRate API.
-            6. Simpan cache baru.
-            7. Hitung hasil konversi.
-            8. Return hasil.
-        """
 
         base_currency = self._normalize_currency(
             kwargs["base_currency"],

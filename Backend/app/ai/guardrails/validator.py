@@ -1,29 +1,3 @@
-"""
-Input Validator untuk TravelPlannerAgent.
-
-Validator bertanggung jawab memastikan input pengguna
-memenuhi standar kualitas sebelum diproses oleh AI.
-
-Responsibility
---------------
-
-- Validasi input kosong
-- Validasi panjang input
-- Validasi karakter kontrol
-- Validasi Unicode
-- Validasi kualitas input
-- Normalisasi prompt
-
-Tidak bertanggung jawab terhadap
-
-- Prompt Injection Detection
-- Moderation
-- Tool Calling
-- RAG
-- LangGraph
-- LLM
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -37,7 +11,6 @@ import re
 @dataclass(slots=True)
 class ValidationIssue:
     """
-    Merepresentasikan satu hasil validasi.
 
     Attributes
     ----------
@@ -53,9 +26,6 @@ class ValidationIssue:
 
 @dataclass(slots=True)
 class ValidationResult:
-    """
-    Hasil validasi input pengguna.
-    """
 
     valid: bool
     normalized_prompt: str
@@ -70,21 +40,8 @@ class ValidationResult:
 
 
 class InputValidator:
-    """
-    Validator untuk seluruh input pengguna.
-
-    Validator ini merupakan guardrail pertama
-    sebelum prompt diproses oleh AI.
-
-    Seluruh validasi dilakukan secara deterministic
-    tanpa bantuan model AI maupun embedding.
-    """
 
     def __init__(self) -> None:
-        """
-        Inisialisasi validator menggunakan konfigurasi
-        dari settings.py.
-        """
 
         self.min_prompt_length = (
             settings.MIN_PROMPT_LENGTH
@@ -106,22 +63,11 @@ class InputValidator:
             settings.MAX_EMOJI_COUNT
         )
 
-    # =====================================================
-    # PUBLIC
-    # =====================================================
-
     def validate(
         self,
         prompt: str,
     ) -> ValidationResult:
         """
-        Memvalidasi prompt pengguna sebelum
-        diproses oleh AI.
-
-        Seluruh validasi dilakukan secara
-        deterministic tanpa menggunakan
-        model AI maupun embedding.
-
         Args
         ----
         prompt:
@@ -140,10 +86,6 @@ class InputValidator:
 
         warnings: list[ValidationIssue] = []
 
-        # ==========================================
-        # Normalize Prompt
-        # ==========================================
-
         normalized_prompt, normalize_warning = (
             self._normalize_prompt(
                 prompt,
@@ -153,10 +95,6 @@ class InputValidator:
         warnings.extend(
             normalize_warning,
         )
-
-        # ==========================================
-        # Validation Pipeline
-        # ==========================================
 
         self._check_empty(
             normalized_prompt,
@@ -213,12 +151,6 @@ class InputValidator:
         self,
         prompt: str,
     ) -> bool:
-        """
-        Mengembalikan status validasi saja.
-
-        Berguna apabila caller hanya
-        membutuhkan nilai boolean.
-        """
 
         return self.validate(
             prompt,
@@ -228,11 +160,6 @@ class InputValidator:
         self,
         prompt: str,
     ) -> str:
-        """
-        Mengembalikan prompt yang telah
-        dinormalisasi tanpa menjalankan
-        seluruh proses validasi.
-        """
 
         normalized, _ = (
             self._normalize_prompt(
@@ -241,10 +168,6 @@ class InputValidator:
         )
 
         return normalized
-    
-    # =====================================================
-    # PRIVATE
-    # =====================================================
 
     def _check_empty(
         self,
@@ -282,9 +205,6 @@ class InputValidator:
         errors: list[ValidationIssue],
     ) -> None:
         """
-        Memastikan panjang prompt berada
-        dalam batas konfigurasi.
-
         Args
         ----
         prompt:
@@ -327,9 +247,6 @@ class InputValidator:
         errors: list[ValidationIssue],
     ) -> None:
         """
-        Memastikan seluruh karakter Unicode
-        valid.
-
         Args
         ----
         prompt:
@@ -365,17 +282,6 @@ class InputValidator:
         errors: list[ValidationIssue],
     ) -> None:
         """
-        Mendeteksi control character
-        selain newline dan tab.
-
-        Karakter seperti:
-
-        \\x00
-        \\x01
-        \\x08
-
-        akan ditolak.
-
         Args
         ----
         prompt:
@@ -417,8 +323,6 @@ class InputValidator:
         prompt: str,
     ) -> tuple[str, list[ValidationIssue]]:
         """
-        Membersihkan whitespace yang tidak diperlukan.
-
         Returns
         -------
         tuple[str, list[str]]
@@ -455,10 +359,6 @@ class InputValidator:
         prompt: str,
         warnings: list[ValidationIssue],
     ) -> None:
-        """
-        Mendeteksi whitespace yang terlalu banyak.
-        """
-
         pattern = (
             rf"\s{{{self.max_consecutive_whitespace},}}"
         )
@@ -484,19 +384,6 @@ class InputValidator:
         prompt: str,
         warnings: list[ValidationIssue],
     ) -> None:
-        """
-        Mendeteksi karakter yang berulang
-        secara berlebihan.
-
-        Contoh
-
-        AAAAAAAAAAAAA
-
-        !!!!!!!!!
-
-        ????????
-        """
-
         pattern = (
             rf"(.)\1{{{self.max_repeated_characters},}}"
         )
@@ -522,11 +409,6 @@ class InputValidator:
         prompt: str,
         warnings: list[ValidationIssue],
     ) -> None:
-        """
-        Mendeteksi jumlah emoji yang
-        terlalu banyak.
-        """
-
         emoji_pattern = re.compile(
 
             "["

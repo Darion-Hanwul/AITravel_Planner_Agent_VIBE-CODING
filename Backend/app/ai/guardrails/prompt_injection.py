@@ -15,23 +15,6 @@ from app.core.logger import logger
 
 
 class RiskLevel(str, Enum):
-    """
-    Tingkat risiko Prompt Injection.
-
-    LOW
-        Tidak ditemukan indikasi.
-
-    MEDIUM
-        Terdapat indikasi ringan.
-
-    HIGH
-        Sangat mencurigakan.
-
-    CRITICAL
-        Hampir dipastikan merupakan
-        Prompt Injection.
-    """
-
     LOW = "LOW"
 
     MEDIUM = "MEDIUM"
@@ -43,22 +26,6 @@ class RiskLevel(str, Enum):
 
 @dataclass(slots=True)
 class InjectionIssue:
-    """
-    Merepresentasikan satu hasil deteksi
-    Prompt Injection.
-
-    Attributes
-    ----------
-    code:
-        Kode unik jenis deteksi.
-
-    message:
-        Penjelasan hasil deteksi.
-
-    score:
-        Nilai kontribusi terhadap total
-        risk score.
-    """
 
     code: str
 
@@ -69,29 +36,6 @@ class InjectionIssue:
 
 @dataclass(slots=True)
 class InjectionResult:
-    """
-    Hasil pemeriksaan Prompt Injection.
-
-    Attributes
-    ----------
-    allowed:
-        Menunjukkan apakah prompt boleh
-        diproses oleh AI.
-
-    score:
-        Total risk score.
-
-    risk_level:
-        Tingkat risiko Prompt Injection.
-
-    issues:
-        Daftar hasil deteksi.
-
-    matched_patterns:
-        Daftar regex atau keyword yang
-        berhasil terdeteksi.
-    """
-
     allowed: bool
 
     score: float
@@ -108,39 +52,11 @@ class InjectionResult:
 
 @dataclass(slots=True)
 class ExampleEmbedding:
-    """
-    Menyimpan pasangan antara contoh
-    Prompt Injection dan embedding-nya.
-
-    Digunakan oleh Embedding Detection
-    agar dapat mengetahui contoh mana
-    yang paling mirip dengan prompt pengguna.
-    """
-
     text: str
 
     embedding: list[float]
 
 class PromptInjectionGuard:
-    """
-    Guard untuk mendeteksi Prompt Injection.
-
-    Guard ini merupakan lapisan keamanan kedua
-    setelah Input Validator.
-
-    Seluruh deteksi dilakukan menggunakan
-    Hybrid Detection yang terdiri dari:
-
-    - Regex Detection
-    - Keyword Detection
-    - Embedding Similarity
-    - Weighted Scoring
-
-    Guard ini tidak menggunakan LLM sehingga
-    proses deteksi bersifat deterministic,
-    cepat, dan konsisten.
-    """
-
     def __init__(
         self,
     ) -> None:
@@ -152,17 +68,9 @@ class PromptInjectionGuard:
             "Initializing PromptInjectionGuard."
         )
 
-        # ==========================================
-        # Embedding
-        # ==========================================
-
         self.embedding_service = (
             EmbeddingService()
         )
-
-        # ==========================================
-        # Threshold
-        # ==========================================
 
         self.threshold = (
             settings.PROMPT_INJECTION_THRESHOLD
@@ -179,9 +87,6 @@ class PromptInjectionGuard:
         self.combined_early_stop = (
             settings.PROMPT_INJECTION_COMBINED_EARLY_STOP
         )
-        # ==========================================
-        # Weight
-        # ==========================================
 
         self.regex_weight = (
             settings.PROMPT_INJECTION_REGEX_WEIGHT
@@ -195,10 +100,6 @@ class PromptInjectionGuard:
             settings.PROMPT_INJECTION_EMBEDDING_WEIGHT
         )
 
-        # ==========================================
-        # Prompt Examples
-        # ==========================================
-
         self.examples_path = Path(
             settings.PROMPT_INJECTION_EXAMPLES_FILE,
         )
@@ -207,17 +108,9 @@ class PromptInjectionGuard:
             self._load_prompt_examples()
         )
 
-        # ==========================================
-        # Embedding Cache
-        # ==========================================
-
         self.example_embeddings = (
             self._build_example_embeddings()
         )
-
-        # ==========================================
-        # Detection Rules
-        # ==========================================
 
         self.regex_patterns = (
             self._load_regex_patterns()
@@ -235,21 +128,9 @@ class PromptInjectionGuard:
             "PromptInjectionGuard initialized successfully."
         )
 
-    # =====================================================
-    # PRIVATE INITIALIZATION
-    # =====================================================
-
     def _load_prompt_examples(
         self,
     ) -> list[str]:
-        """
-        Membaca dataset Prompt Injection.
-
-        Returns
-        -------
-        list[str]
-        """
-
         if not self.examples_path.exists():
 
             logger.warning(
@@ -290,19 +171,6 @@ class PromptInjectionGuard:
     def _build_example_embeddings(
         self,
     ) -> list[ExampleEmbedding]:
-        """
-        Membuat embedding seluruh contoh
-        Prompt Injection.
-
-        Embedding hanya dibuat sekali saat
-        inisialisasi agar tidak membebani
-        setiap request.
-
-        Returns
-        -------
-        list[list[float]]
-        """
-
         if not self.prompt_examples:
 
             return []
@@ -344,24 +212,7 @@ class PromptInjectionGuard:
     def _load_regex_patterns(
         self,
     ) -> dict[str, tuple[re.Pattern[str], float]]:
-        """
-        Memuat seluruh regex pattern
-        Prompt Injection.
-
-        Setiap pattern memiliki weight
-        yang akan digunakan pada
-        Weighted Scoring Engine.
-
-        Returns
-        -------
-        dict[str, tuple[str, float]]
-        """
-
         return {
-
-        # =====================================
-        # Instruction Override
-        # =====================================
 
         "IGNORE_INSTRUCTION": (
             re.compile(
@@ -395,10 +246,6 @@ class PromptInjectionGuard:
             0.50,
         ),
 
-        # =====================================
-        # System Prompt Disclosure
-        # =====================================
-
         "SYSTEM_PROMPT": (
             re.compile(
                 r"system\s+prompt",
@@ -431,10 +278,6 @@ class PromptInjectionGuard:
             0.30,
         ),
 
-        # =====================================
-        # Prompt Disclosure
-        # =====================================
-
         "REVEAL_SYSTEM_PROMPT": (
             re.compile(
                 r"(reveal|show|display|print|expose)\s+.*"
@@ -452,10 +295,6 @@ class PromptInjectionGuard:
             ),
             0.45,
         ),
-
-        # =====================================
-        # Jailbreak
-        # =====================================
 
         "JAILBREAK": (
             re.compile(
@@ -481,10 +320,6 @@ class PromptInjectionGuard:
             0.45,
         ),
 
-        # =====================================
-        # Role Override
-        # =====================================
-
         "ACT_AS": (
             re.compile(
                 r"act\s+as\s+.*",
@@ -509,10 +344,6 @@ class PromptInjectionGuard:
             0.25,
         ),
 
-        # =====================================
-        # Tool Disclosure
-        # =====================================
-
         "TOOLS_DISCLOSURE": (
             re.compile(
                 r"(show|reveal|display|list|print)\s+.*"
@@ -521,10 +352,6 @@ class PromptInjectionGuard:
             ),
             0.40,
         ),
-
-        # =====================================
-        # Memory Disclosure
-        # =====================================
 
         "MEMORY": (
             re.compile(
@@ -538,19 +365,6 @@ class PromptInjectionGuard:
     def _compile_keyword_patterns(
         self,
     ) -> dict[str, list[re.Pattern[str]]]:
-        """
-        Meng-compile seluruh keyword menjadi
-        regex pattern.
-
-        Pattern dibuat satu kali saat
-        inisialisasi agar tidak perlu
-        melakukan compile pada setiap request.
-
-        Returns
-        -------
-        dict[str, list[re.Pattern[str]]]
-        """
-
         compiled: dict[
             str,
             list[re.Pattern[str]]
@@ -577,23 +391,7 @@ class PromptInjectionGuard:
     def _load_keyword_groups(
         self,
     ) -> dict[str, tuple[list[str], float]]:
-        """
-        Memuat kelompok keyword Prompt Injection.
-
-        Setiap kelompok memiliki bobot
-        yang akan digunakan pada
-        Weighted Scoring.
-
-        Returns
-        -------
-        dict[str, tuple[list[str], float]]
-        """
-
         return {
-
-            # =====================================
-            # Instruction Override
-            # =====================================
 
             "IGNORE": (
                 [
@@ -607,10 +405,6 @@ class PromptInjectionGuard:
                 0.30,
             ),
 
-            # =====================================
-            # System Prompt
-            # =====================================
-
             "SYSTEM_PROMPT": (
                 [
                     "system prompt",
@@ -621,10 +415,6 @@ class PromptInjectionGuard:
                 ],
                 0.35,
             ),
-
-            # =====================================
-            # Reveal
-            # =====================================
 
             "DISCLOSURE": (
                 [
@@ -638,10 +428,6 @@ class PromptInjectionGuard:
                 0.25,
             ),
 
-            # =====================================
-            # Jailbreak
-            # =====================================
-
             "JAILBREAK": (
                 [
                     "jailbreak",
@@ -653,10 +439,6 @@ class PromptInjectionGuard:
                 0.45,
             ),
 
-            # =====================================
-            # Role Override
-            # =====================================
-
             "ROLE": (
                 [
                     "act as",
@@ -666,14 +448,6 @@ class PromptInjectionGuard:
                 ],
                 0.25,
             ),
-
-            # =====================================
-            # Internal
-            # =====================================
-
-            # =====================================
-            # Internal Access
-            # =====================================
 
             "INTERNAL": (
                 [
@@ -695,31 +469,11 @@ class PromptInjectionGuard:
                 0.35,
             ),
         }
-    
-    # =====================================================
-    # PUBLIC
-    # =====================================================
 
     def check(
         self,
         prompt: str,
     ) -> InjectionResult:
-        """
-        Melakukan pemeriksaan Prompt Injection.
-
-        Seluruh engine akan dijalankan kemudian
-        menghasilkan satu keputusan akhir.
-
-        Args
-        ----
-        prompt:
-            Prompt pengguna.
-
-        Returns
-        -------
-        InjectionResult
-        """
-
         logger.debug(
             "Starting prompt injection detection."
         )
@@ -728,19 +482,11 @@ class PromptInjectionGuard:
 
         matched_patterns: list[str] = []
 
-        # ==========================================
-        # Regex Detection
-        # ==========================================
-
         regex_score = self._regex_detection(
             prompt=prompt,
             issues=issues,
             matched_patterns=matched_patterns,
         )
-
-        # ==========================================
-        # Early Stop (Regex)
-        # ==========================================
 
         if regex_score >= self.regex_early_stop:
 
@@ -755,10 +501,6 @@ class PromptInjectionGuard:
                 issues=issues,
                 matched_patterns=matched_patterns,
             )
-
-        # ==========================================
-        # Keyword Detection
-        # ==========================================
 
         keyword_score = self._keyword_detection(
             prompt=prompt,
@@ -842,23 +584,6 @@ class PromptInjectionGuard:
         self,
         prompt: str,
     ) -> bool:
-        """
-        Memeriksa apakah prompt aman
-        untuk diproses.
-
-        Method ini berguna apabila caller
-        hanya membutuhkan nilai boolean.
-
-        Args
-        ----
-        prompt:
-            Prompt pengguna.
-
-        Returns
-        -------
-        bool
-        """
-
         return self.check(
             prompt,
         ).allowed
@@ -867,19 +592,6 @@ class PromptInjectionGuard:
         self,
         prompt: str,
     ) -> float:
-        """
-        Mengembalikan nilai risk score.
-
-        Args
-        ----
-        prompt:
-            Prompt pengguna.
-
-        Returns
-        -------
-        float
-        """
-
         return self.check(
             prompt,
         ).score
@@ -888,26 +600,9 @@ class PromptInjectionGuard:
         self,
         prompt: str,
     ) -> RiskLevel:
-        """
-        Mengembalikan tingkat risiko
-        Prompt Injection.
-
-        Args
-        ----
-        prompt:
-            Prompt pengguna.
-
-        Returns
-        -------
-        RiskLevel
-        """
-
         return self.check(
             prompt,
         ).risk_level
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
 
     def _calculate_score(
         self,
@@ -916,18 +611,6 @@ class PromptInjectionGuard:
         keyword_score: float,
         embedding_score: float,
     ) -> float:
-        """
-        Menghitung total risk score menggunakan
-        Weighted Scoring.
-
-        Returns
-        -------
-        float
-
-            Total score antara
-            0.0 hingga 1.0.
-        """
-
         logger.debug(
             "Calculating weighted risk score."
         )
@@ -977,15 +660,6 @@ class PromptInjectionGuard:
         self,
         score: float,
     ) -> RiskLevel:
-        """
-        Menentukan tingkat risiko
-        berdasarkan total score.
-
-        Returns
-        -------
-        RiskLevel
-        """
-
         if score >= 0.90:
 
             return RiskLevel.CRITICAL
@@ -1004,15 +678,6 @@ class PromptInjectionGuard:
         self,
         score: float,
     ) -> bool:
-        """
-        Menentukan apakah prompt
-        boleh diproses.
-
-        Returns
-        -------
-        bool
-        """
-
         allowed = (
             score
             < self.threshold
@@ -1031,9 +696,6 @@ class PromptInjectionGuard:
         )
 
         return allowed
-    # =====================================================
-    # DETECTION ENGINES
-    # =====================================================
 
     def _regex_detection(
         self,
@@ -1042,19 +704,6 @@ class PromptInjectionGuard:
         issues: list[InjectionIssue],
         matched_patterns: list[str],
     ) -> float:
-        """
-        Regex Detection Engine.
-
-        Mendeteksi Prompt Injection
-        menggunakan Regular Expression.
-
-        Returns
-        -------
-        float
-
-            Regex risk score.
-        """
-
         logger.debug(
             "Running regex detection."
         )
@@ -1103,19 +752,6 @@ class PromptInjectionGuard:
         issues: list[InjectionIssue],
         matched_patterns: list[str],
     ) -> float:
-        """
-        Keyword Detection Engine.
-
-        Mendeteksi Prompt Injection
-        menggunakan keyword matching.
-
-        Returns
-        -------
-        float
-
-            Keyword risk score.
-        """
-
         logger.debug(
             "Running keyword detection."
         )
@@ -1187,18 +823,6 @@ class PromptInjectionGuard:
         vector_a: list[float],
         vector_b: list[float],
     ) -> float:
-        """
-        Menghitung Cosine Similarity antara dua
-        embedding vector menggunakan NumPy.
-
-        Returns
-        -------
-        float
-
-            Nilai similarity antara
-            0.0 hingga 1.0.
-        """
-
         if (
             not vector_a
             or not vector_b
@@ -1236,17 +860,6 @@ class PromptInjectionGuard:
         prompt: str,
         issues: list[InjectionIssue],
     ) -> float:
-        """
-        Embedding Similarity Engine.
-
-        Mendeteksi Prompt Injection
-        menggunakan semantic similarity.
-
-        Returns
-        -------
-        float
-        """
-
         logger.debug(
             "Running embedding detection."
         )
@@ -1299,10 +912,6 @@ class PromptInjectionGuard:
 
                 best_example = example.text
 
-        # ==========================================
-        # Debug Logging
-        # ==========================================
-
         if best_example is not None:
 
             logger.debug(
@@ -1318,10 +927,6 @@ class PromptInjectionGuard:
             "Highest embedding similarity: {:.3f}",
             highest_similarity,
         )
-
-        # ==========================================
-        # Threshold
-        # ==========================================
 
         if (
             highest_similarity
@@ -1345,9 +950,6 @@ class PromptInjectionGuard:
     def __repr__(
         self,
     ) -> str:
-        """
-        Representasi PromptInjectionGuard.
-        """
 
         return (
             f"{self.__class__.__name__}("

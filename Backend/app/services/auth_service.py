@@ -33,19 +33,6 @@ from app.services.base_service import BaseService
 
 
 class AuthService(BaseService):
-    """
-    Authentication service.
-
-    Bertanggung jawab terhadap proses:
-
-    - Register
-    - Login
-    - Refresh Token
-    - Change Password
-
-    Service ini tidak menangani profile user.
-    """
-
     def __init__(
         self,
         db: Session,
@@ -53,8 +40,6 @@ class AuthService(BaseService):
         super().__init__(db)
 
         self.user_repository: UserRepository = UserRepository()
-
-    # PRIVATE HELPERS
     
     def _get_user_by_email(
         self,
@@ -73,13 +58,6 @@ class AuthService(BaseService):
         self,
         user_id: UUID,
     ) -> User:
-        """
-        Mengambil user berdasarkan ID.
-
-        Raises:
-            UserNotFoundError
-        """
-
         user = self.user_repository.get_by_id(
             self.db,
             user_id,
@@ -98,10 +76,6 @@ class AuthService(BaseService):
         self,
         password: str,
     ) -> None:
-        """
-        Memastikan password memenuhi policy aplikasi.
-        """
-
         valid, message = validate_password_strength(
             password,
         )
@@ -114,13 +88,6 @@ class AuthService(BaseService):
         email: str,
         password: str,
     ) -> User:
-        """
-        Memverifikasi email dan password.
-
-        Raises:
-            InvalidCredentialsError
-        """
-
         user = self._get_user_by_email(
             email,
         )
@@ -144,10 +111,6 @@ class AuthService(BaseService):
         self,
         email: str,
     ) -> None:
-        """
-        Memastikan email belum digunakan.
-        """
-
         existing_user = self._get_user_by_email(
             email,
         )
@@ -161,10 +124,6 @@ class AuthService(BaseService):
         self,
         user: User,
     ) -> str:
-        """
-        Generate access token untuk user.
-        """
-
         return create_access_token(
             subject=str(user.id),
         )
@@ -173,10 +132,6 @@ class AuthService(BaseService):
         self,
         user: User,
     ) -> str:
-        """
-        Generate refresh token untuk user.
-        """
-
         return create_refresh_token(
             subject=str(user.id),
         )
@@ -186,9 +141,6 @@ class AuthService(BaseService):
         user: User,
         password: str,
     ) -> None:
-        """
-        Update user password.
-        """
 
         user.password_hash = hash_password(
             password,
@@ -198,8 +150,6 @@ class AuthService(BaseService):
             self.db,
             user,
         )
-        
-    # PUBLIC METHODS
 
     def register(
         self,
@@ -207,18 +157,6 @@ class AuthService(BaseService):
         email: str,
         password: str,
     ) -> TokenResponse:
-        """
-        Mendaftarkan pengguna baru.
-
-        Workflow:
-            1. Validasi password.
-            2. Pastikan email belum digunakan.
-            3. Hash password.
-            4. Simpan user.
-            5. Commit transaction.
-            6. Generate access dan refresh token.
-        """
-
         self._validate_new_password(
             password,
         )
@@ -266,10 +204,6 @@ class AuthService(BaseService):
         email: str,
         password: str,
     ) -> TokenResponse:
-        """
-        Authenticate user dan menghasilkan JWT.
-        """
-
         user = self._authenticate_user(
             email=email,
             password=password,
@@ -288,10 +222,6 @@ class AuthService(BaseService):
         self,
         refresh_token: str,
     ) -> TokenResponse:
-        """
-        Generate access token baru menggunakan refresh token.
-        """
-
         payload = decode_refresh_token(
             refresh_token,
         )
@@ -317,15 +247,6 @@ class AuthService(BaseService):
         old_password: str,
         new_password: str,
     ) -> None:
-        """
-        Change user password.
-
-        Raises:
-            UserNotFoundError
-            InvalidCredentialsError
-            WeakPasswordError
-        """
-
         user = self._get_user_by_id(
             user_id,
         )
@@ -359,15 +280,6 @@ class AuthService(BaseService):
         self,
         access_token: str,
     ) -> User:
-        """
-        Verify access token and return authenticated user.
-
-        Raises:
-            InvalidTokenError
-            ExpiredTokenError
-            UserNotFoundError
-        """
-
         payload = decode_access_token(
             access_token,
         )

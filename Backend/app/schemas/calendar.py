@@ -4,11 +4,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-# ==========================================================
-# Base
-# ==========================================================
-
 class CalendarEventBase(BaseModel):
 
     event_title: str = Field(..., min_length=2, max_length=200)
@@ -25,18 +20,8 @@ class CalendarEventBase(BaseModel):
         extra="forbid",
     )
 
-
-# ==========================================================
-# Create
-# ==========================================================
-
 class CalendarEventCreate(CalendarEventBase):
     activity_id: UUID
-
-
-# ==========================================================
-# Update
-# ==========================================================
 
 class CalendarEventUpdate(BaseModel):
 
@@ -53,11 +38,6 @@ class CalendarEventUpdate(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-
-
-# ==========================================================
-# Response
-# ==========================================================
 
 class CalendarEventResponse(CalendarEventBase):
 

@@ -4,12 +4,8 @@ import logging
 from typing import Any, TypedDict
 
 logger = logging.getLogger("app.ai.memory.trip")
-
-
 class TripProfile(TypedDict, total=False):
-    """
-    Skema data preferensi rencana perjalanan pengguna yang terstruktur.
-    """
+
     destination: str
     travel_dates: str
     duration_days: int
@@ -17,21 +13,7 @@ class TripProfile(TypedDict, total=False):
     user_nationality: str
     preferences: list[str]  # e.g., ["no seafood", "museum lover"]
     excluded_activities: list[str]
-
-
 class TripMemory:
-    """
-    TripMemory bertanggung jawab mengelola status, parameter, dan preferensi 
-    rencana perjalanan pengguna yang terakumulasi selama sesi berlangsung (Prinsip 1, 18).
-
-    Responsibility
-    --------------
-    - Menyimpan dan memperbarui profil preferensi rencana perjalanan (`TripProfile`) per user/session.
-    - Menyediakan data preferensi terstruktur untuk diinjeksikan langsung ke AgentState LangGraph.
-
-    Tidak bertanggung jawab terhadap:
-    - Penyimpanan riwayat teks obrolan mentah (tugas ConversationMemory).
-    """
 
     def __init__(self) -> None:
         # In-memory storage. Dapat digantikan oleh persistent database pada database layer (Prinsip 2).
@@ -55,13 +37,6 @@ class TripMemory:
         return self._profiles[session_id]
 
     def update_profile(self, session_id: str, updates: dict[str, Any]) -> TripProfile:
-        """
-        Memperbarui data profil perjalanan secara aman dengan menggabungkan (merging) data baru.
-
-        Args:
-            session_id: ID unik sesi percakapan.
-            updates: Dictionary berisi potongan preferensi baru yang berhasil diekstraksi.
-        """
         current_profile = self.get_profile(session_id)
         
         # Lakukan pembaruan secara selektif

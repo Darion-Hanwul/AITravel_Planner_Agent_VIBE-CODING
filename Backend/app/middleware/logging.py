@@ -1,15 +1,3 @@
-"""
-Logging Middleware.
-
-Middleware ini bertanggung jawab untuk:
-
-- Mencatat seluruh HTTP request.
-- Menghitung waktu pemrosesan request.
-- Menambahkan informasi request ke log aplikasi.
-
-Middleware ini tidak mengubah response.
-"""
-
 from __future__ import annotations
 
 import time
@@ -24,9 +12,6 @@ from app.core.logger import logger
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
-    """
-    Middleware untuk mencatat seluruh request dan response.
-    """
 
     async def dispatch(
         self,

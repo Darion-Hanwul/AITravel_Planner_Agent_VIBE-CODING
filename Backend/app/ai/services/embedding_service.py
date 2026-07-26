@@ -22,36 +22,16 @@ from app.ai.models.ollama import OllamaModel
 
 
 class EmbeddingService:
-    """
-    Service pembuat embedding dokumen.
-
-    Seluruh AI Layer harus menggunakan service ini
-    agar proses embedding terpusat dan konsisten.
-    """
 
     def __init__(self) -> None:
         self.embedding_model = (
             OllamaModel.get_embedding_model()
         )
 
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
-
     def _embed(
         self,
         text: str,
     ) -> list[float]:
-        """
-        Menghasilkan embedding dari sebuah teks.
-
-        Args:
-            text:
-                Teks yang akan di-embedding.
-
-        Returns:
-            Vector embedding.
-        """
 
         return self.embedding_model.embed_query(
             text,
@@ -61,25 +41,6 @@ class EmbeddingService:
         self,
         text: str,
     ) -> list[float]:
-        """
-        Menghasilkan embedding dari sebuah teks.
-
-        Method ini digunakan oleh AI Component
-        yang tidak menggunakan LangChain Document,
-        seperti:
-
-        - Prompt Injection Guard
-        - Moderation
-        - Intent Detection
-        - Memory
-
-        Args:
-            text:
-                Teks yang akan di-embedding.
-
-        Returns:
-            Vector embedding.
-        """
 
         return self._embed(
             text,
@@ -89,21 +50,7 @@ class EmbeddingService:
         self,
         texts: list[str],
     ) -> list[list[float]]:
-        """
-        Menghasilkan embedding untuk banyak teks.
-
-        Berbeda dengan embed_documents(),
-        method ini menerima list string biasa
-        tanpa perlu membuat LangChain Document.
-
-        Args:
-            texts:
-                Daftar teks.
-
-        Returns:
-            List vector embedding.
-        """
-
+        
         if not texts:
             return []
 
@@ -111,25 +58,10 @@ class EmbeddingService:
             texts,
         )
 
-    # =====================================================
-    # PUBLIC METHODS
-    # =====================================================
-
     def embed_document(
         self,
         document: Document,
     ) -> EmbeddedDocument:
-        """
-        Menghasilkan embedding untuk satu dokumen.
-
-        Args:
-            document:
-                LangChain Document.
-
-        Returns:
-            EmbeddedDocument.
-        """
-
         embedding = self._embed(
             document.page_content,
         )
@@ -143,17 +75,6 @@ class EmbeddingService:
         self,
         documents: list[Document],
     ) -> list[EmbeddedDocument]:
-        """
-        Menghasilkan embedding untuk banyak dokumen.
-
-        Args:
-            documents:
-                Daftar LangChain Document.
-
-        Returns:
-            List EmbeddedDocument.
-        """
-
         if not documents:
             return []
 

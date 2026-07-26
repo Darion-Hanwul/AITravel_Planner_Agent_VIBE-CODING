@@ -6,9 +6,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.trip_day import TripDayDetailResponse
 from app.core.constants import TripStatus
-# ==========================================================
-# Base
-# ==========================================================
 
 class TripBase(BaseModel):
 
@@ -25,11 +22,6 @@ class TripBase(BaseModel):
     total_estimated_cost: Decimal = Field(..., ge=0)
 
     status: TripStatus
-
-
-# ==========================================================
-# Create
-# ==========================================================
 
 class TripCreate(BaseModel):
 
@@ -48,10 +40,6 @@ class TripCreate(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-
-# ==========================================================
-# Update
-# ==========================================================
 
 class TripUpdate(BaseModel):
 
@@ -73,11 +61,6 @@ class TripUpdate(BaseModel):
         extra="forbid",
     )
 
-
-# ==========================================================
-# Response
-# ==========================================================
-
 class TripResponse(TripBase):
 
     id: UUID
@@ -89,11 +72,6 @@ class TripResponse(TripBase):
     model_config = ConfigDict(
         from_attributes=True
     )
-
-
-# ==========================================================
-# Detail Response
-# ==========================================================
 
 class TripDetailResponse(TripResponse):
 

@@ -11,10 +11,6 @@ from app.ai.sources.registry import SourceRegistry
 
 
 class IndexingService:
-    """
-    Service untuk melakukan indexing seluruh
-    knowledge source ke Weaviate.
-    """
 
     def __init__(
         self,
@@ -34,18 +30,9 @@ class IndexingService:
 
         self.weaviate = WeaviateModel()
 
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
-
     async def _load_documents(
         self,
     ) -> list[Document]:
-        """
-        Mengambil seluruh document dari seluruh
-        source yang ada pada registry.
-        """
-
         documents: list[Document] = []
 
         for source in self.registry.get_all():
@@ -66,23 +53,10 @@ class IndexingService:
 
         return documents
 
-    # =====================================================
-    # PUBLIC METHODS
-    # =====================================================
-
     async def index_collection(
         self,
         collection_name: str,
     ) -> int:
-        """
-        Melakukan indexing seluruh knowledge source.
-
-        Returns
-        -------
-        int
-            Jumlah chunk yang berhasil diindex.
-        """
-
         documents = await self._load_documents()
 
         chunks = self.chunk_loader.split_documents(
@@ -115,10 +89,6 @@ class IndexingService:
         self,
         collection_name: str,
     ) -> int:
-        """
-        Menghapus collection lama kemudian
-        melakukan indexing ulang.
-        """
 
         if self.weaviate.collection_exists(
             collection_name,
@@ -134,8 +104,4 @@ class IndexingService:
     def close(
         self,
     ) -> None:
-        """
-        Menutup koneksi Weaviate.
-        """
-
         self.weaviate.close()

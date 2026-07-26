@@ -1,7 +1,3 @@
-"""
-Authentication Dependencies.
-"""
-
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
@@ -27,9 +23,6 @@ def get_current_user(
         get_auth_service,
     ),
 ) -> User:
-    """
-    Return authenticated user.
-    """
 
     try:
 

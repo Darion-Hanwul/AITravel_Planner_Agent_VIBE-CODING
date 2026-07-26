@@ -8,27 +8,6 @@ from app.core.logger import logger
 
 
 class RAGTool(BaseTool):
-    """
-    Retrieval-Augmented Generation (RAG) Tool.
-
-    Responsibility
-    --------------
-
-    - Menjadi adapter antara AI Agent dan RAGService.
-    - Meneruskan permintaan retrieval ke RAGService.
-    - Mengelola lifecycle RAGService.
-    - Logging proses eksekusi tool.
-
-    Tidak bertanggung jawab terhadap:
-
-    - Prompt engineering
-    - Document retrieval
-    - Embedding
-    - Vector search
-    - Hybrid search
-    - LLM invocation
-    - LangGraph workflow
-    """
 
     NAME = "rag"
 
@@ -49,52 +28,25 @@ class RAGTool(BaseTool):
             enabled=enabled,
         )
 
-    # =====================================================
-    # METADATA
-    # =====================================================
-
     @property
     def name(
         self,
     ) -> str:
-        """
-        Tool name.
-        """
+
         return self.NAME
 
     @property
     def description(
         self,
     ) -> str:
-        """
-        Tool description.
-        """
+
         return self.DESCRIPTION
     
-    # =====================================================
-    # PRIVATE HELPERS
-    # =====================================================
-
     def _create_service(
         self,
         *,
         temperature: float | None = None,
     ) -> RAGService:
-        """
-        Membuat instance RAGService.
-
-        RAGTool tidak menyimpan instance service sebagai state
-        agar setiap eksekusi memiliki lifecycle yang terpisah,
-        termasuk resource seperti koneksi Weaviate yang
-        dikelola oleh RAGService.
-
-        Args:
-            temperature:
-                Override temperature model apabila diperlukan.
-
-        Returns:
-            Instance RAGService.
-        """
 
         logger.debug(
             "Creating RAGService instance."
@@ -104,42 +56,10 @@ class RAGTool(BaseTool):
             temperature=temperature,
         )
     
-    # =====================================================
-    # PUBLIC METHODS
-    # =====================================================
-
     def run(
         self,
         **kwargs: Any,
     ) -> str:
-        """
-        Menjawab pertanyaan menggunakan
-        Retrieval-Augmented Generation (RAG).
-
-        Workflow:
-
-            1. Membuat RAGService.
-            2. Meneruskan permintaan ke RAGService.
-            3. Mengembalikan hasil dari RAGService.
-            4. Menutup seluruh resource.
-
-        Args:
-            question:
-                Pertanyaan pengguna.
-
-            history:
-                Riwayat percakapan sebelumnya.
-
-            top_k:
-                Jumlah maksimum dokumen yang diambil
-                dari vector database.
-
-            temperature:
-                Override temperature model.
-
-        Returns:
-            Jawaban dari RAGService.
-        """
 
         question = kwargs.get("question")
 

@@ -18,9 +18,6 @@ logger = logging.getLogger("app.main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Mengelola siklus hidup (lifespan) aplikasi saat startup dan shutdown.
-    """
     logger.info(f"Memulai {settings.APP_NAME}...")
 
     try:
@@ -53,9 +50,6 @@ app.add_middleware(
 
 @app.get("/", tags=["Root"])
 async def root():
-    """
-    Endpoint utama untuk verifikasi status aplikasi.
-    """
     return {
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
@@ -66,9 +60,6 @@ async def root():
 
 @app.get("/health", tags=["System"])
 async def health_check():
-    """
-    Endpoint health-check untuk kebutuhan monitoring container docker/orchestrator.
-    """
     return {
         "status": "healthy",
         "service": settings.APP_NAME,
@@ -77,9 +68,6 @@ async def health_check():
 
 @app.get("/db-test", tags=["System"])
 async def db_test():
-    """
-    Endpoint uji koneksi untuk memeriksa keaktifan PostgreSQL engine.
-    """
     try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT version();"))

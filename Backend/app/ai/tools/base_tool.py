@@ -5,24 +5,6 @@ from typing import Any
 
 
 class BaseTool(ABC):
-    """
-    Base class untuk seluruh AI Tool.
-
-    Responsibility
-    --------------
-
-    - Menyediakan interface yang konsisten
-    - Validasi enable/disable
-    - Metadata tool
-    - Entry point eksekusi
-
-    Tidak bertanggung jawab terhadap:
-
-    - LLM
-    - LangGraph
-    - Prompt
-    - Memory
-    """
 
     def __init__(
         self,
@@ -31,10 +13,6 @@ class BaseTool(ABC):
     ) -> None:
 
         self._enabled = enabled
-
-    # =====================================================
-    # METADATA
-    # =====================================================
 
     @property
     @abstractmethod
@@ -61,10 +39,6 @@ class BaseTool(ABC):
         Dipakai untuk Tool Calling.
         """
 
-    # =====================================================
-    # STATUS
-    # =====================================================
-
     @property
     def enabled(
         self,
@@ -84,21 +58,11 @@ class BaseTool(ABC):
 
         self._enabled = False
 
-    # =====================================================
-    # EXECUTION
-    # =====================================================
-
     def execute(
         self,
         **kwargs: Any,
     ) -> Any:
-        """
-        Entry point seluruh tool.
-
-        LangGraph maupun Agent cukup
-        memanggil execute().
-        """
-
+ 
         if not self.enabled:
             raise RuntimeError(
                 f"{self.name} tool is disabled."
@@ -117,19 +81,10 @@ class BaseTool(ABC):
         Business logic tool.
         """
 
-    # =====================================================
-    # REPRESENTATION
-    # =====================================================
-
     def to_dict(
         self,
     ) -> dict[str, Any]:
-        """
-        Metadata tool.
-
-        Berguna untuk Agent Registry.
-        """
-
+        
         return {
             "name": self.name,
             "description": self.description,
