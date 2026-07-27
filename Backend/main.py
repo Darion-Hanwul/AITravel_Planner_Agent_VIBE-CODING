@@ -7,6 +7,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+from app.api import (
+    auth,
+    calendar,
+    chat,
+    history,
+    rag,
+    saved_place,
+    tool,
+    trip,
+    user,
+)
 from app.config.cors import ALLOWED_ORIGINS
 from app.config.settings import settings
 from app.db.init_db import init_database
@@ -15,21 +26,18 @@ from app.middleware.exception import register_exception_handlers
 
 logger = logging.getLogger("app.main")
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info(f"Memulai {settings.APP_NAME}...")
-
     try:
         init_database()
         logger.info("Inisialisasi database sukses dilakukan.")
     except Exception as exc:
         logger.critical(f"Gagal melakukan inisialisasi database saat startup: {exc}")
-
     yield
-
     logger.info(f"Menghentikan {settings.APP_NAME}...")
 
+# 1. Buat SATU instansiasi FastAPI dengan parameter lengkap
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -37,15 +45,28 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# 2. Daftarkan Exception Handlers
 register_exception_handlers(app)
 
+# 3. Pasang SATU blok CORS Middleware dengan konfigurasi terpusat
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=ALLOWED_ORIGINS if ALLOWED_ORIGINS else ["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 4. WAJIB: Daftarkan seluruh router backend agar endpoint dapat diakses secara legal
+app.include_router(auth.router)
+app.include_router(user.router)
+app.include_router(trip.router)
+app.include_router(chat.router)
+app.include_router(calendar.router)
+app.include_router(history.router)
+app.include_router(saved_place.router)
+app.include_router(tool.router)
+app.include_router(rag.router)
 
 
 @app.get("/", tags=["Root"])

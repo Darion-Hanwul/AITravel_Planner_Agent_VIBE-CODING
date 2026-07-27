@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import logging
+import uuid
 from datetime import timedelta
 from typing import Any
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -41,18 +43,23 @@ def signup(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
 
     try:
         hashed_password = hash_password(user_in.password)
+        waktu_sekarang = datetime.utcnow()
+
         new_user = User(
+            id=str(uuid.uuid4()),
             full_name=user_in.full_name,
             email=user_in.email,
             password_hash=hashed_password,
-            avatar_url=None
+            avatar_url=None,
+            created_at=waktu_sekarang, # Wajib diisi agar PostgreSQL tidak menolak
+            updated_at=waktu_sekarang  # Wajib diisi agar PostgreSQL tidak menolak
         )
         
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
         
-        logger.info(f"[Auth API] Pengguna sukses terdaftar. ID: {new_user.id}")
+        logger.info(f"[Auth API] Pengguna sukses terdaftar secara legal. ID: {new_user.id}")
         return new_user
         
     except Exception as exc:

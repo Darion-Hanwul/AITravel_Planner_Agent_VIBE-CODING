@@ -113,11 +113,12 @@ def delete_session(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
 
 
+# KEMBALIKAN KE JALUR RESMI: Validasi token JWT diaktifkan kembali
 @router.post("/sessions/{session_id}/messages", response_model=ChatMessageResponse, status_code=status.HTTP_201_CREATED)
 def send_message(
     session_id: UUID,
-    message_text: str,  # Sesuai parameter penampung string pada send_message() milik ChatService
-    current_user: Any = Depends(get_current_user_from_token),
+    message_text: str,  
+    current_user: Any = Depends(get_current_user_from_token), # Resmi & Aman
     chat_service: ChatService = Depends(get_chat_service),
 ) -> Any:
     logger.info(f"[Chat API] Mengirim pesan ke sesi {session_id} oleh User ID: {current_user.id}")

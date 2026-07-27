@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from Backend.app.core.exceptions import (
+from app.core.exceptions import (
     AppException,
     AuthenticationError,
     ConflictError,
