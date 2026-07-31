@@ -37,7 +37,6 @@ async def lifespan(app: FastAPI):
     yield
     logger.info(f"Menghentikan {settings.APP_NAME}...")
 
-# 1. Buat SATU instansiasi FastAPI dengan parameter lengkap
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -45,10 +44,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# 2. Daftarkan Exception Handlers
 register_exception_handlers(app)
 
-# 3. Pasang SATU blok CORS Middleware dengan konfigurasi terpusat
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS if ALLOWED_ORIGINS else ["http://localhost:5173"],
@@ -57,7 +54,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 4. WAJIB: Daftarkan seluruh router backend agar endpoint dapat diakses secara legal
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(trip.router)
